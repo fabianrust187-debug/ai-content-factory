@@ -63,7 +63,7 @@
         <button class="outline-btn" id="piperCancel" disabled>■ Abbrechen</button>
         <a id="piperDownload" class="outline-btn" style="text-decoration:none" download="sprecherstimme-piper.wav" hidden>WAV herunterladen</a>
        </div>
-       <progress id="piperProgress" max="100" style="display:block;width:100%;height:12px;accent-color:#9f87ce" hidden aria-label="Piper-Fortschritt"></progress>
+       <progress id="piperProgress" max="100" style="width:100%;height:12px;accent-color:#9f87ce" hidden aria-label="Piper-Fortschritt"></progress>
        <p class="subtle" id="piperStatus" role="status" aria-live="polite">Kostenlos und ohne OpenAI. Starte zuerst „Kurzen Test sprechen“. Das Modell wird bei der ersten Verwendung heruntergeladen (rund 60 MB). Die eigentliche Sprachberechnung läuft anschließend abschnittsweise im Hintergrund, mit Fortschritt und Abbruchmöglichkeit.</p>
       </div>
       <label class="audio-label">Oder eigene MP3/WAV-Datei<input id="voiceInput" type="file" accept="audio/*" /></label><div id="voiceStatus" class="subtle">Noch keine Audiodatei ausgewählt.</div><audio controls id="audioPreview" hidden></audio></div>
