@@ -6,11 +6,35 @@
 @media(max-width:900px){.sidebar{width:70px;padding:24px 8px}.brand{padding:2px 7px 40px}.brand>div:last-child,.side-caption,.nav i,.sidebar-tip,.side-footer>div:not(.avatar),.side-footer>span{display:none}.sidebar nav .nav{justify-content:center;font-size:0;padding:12px}.sidebar nav .nav>span{font-size:21px}.side-footer{margin-top:auto;justify-content:center}.content{padding:32px 24px 0}.workspace-grid{grid-template-columns:1fr 300px}.preview-side{padding:19px 13px}.phone-wrap{width:210px}.preview-title{font-size:8px}.preview-title>span{display:none}.editor-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.layout{display:block;padding-bottom:63px}.sidebar{position:fixed;z-index:40;bottom:0;top:auto;left:0;right:0;height:62px;width:100%;padding:6px 7px;background:#121622;border-top:1px solid #343a4a;border-right:0}.sidebar .brand,.sidebar .side-footer{display:none}.sidebar nav{display:flex;flex-direction:row;justify-content:space-around;height:100%}.sidebar nav .nav{display:flex;flex:1;flex-direction:column;justify-content:center;gap:1px;border:0;padding:6px 4px;font-size:9px}.sidebar nav .nav>span{font-size:18px}.topbar{height:53px;padding:0 16px}.content{padding:30px 15px 0}.page-heading{align-items:start}.version-tag{display:none}.page-heading h1{font-size:36px;letter-spacing:-1.4px}.page-heading p{line-height:1.5}.stats{gap:7px;margin-bottom:33px}.stat{padding:12px 10px}.stat>span{font-size:8px;letter-spacing:.6px}.stat strong{font-size:21px}.stat p{font-size:9px;line-height:1.5}.workspace-grid{grid-template-columns:1fr}.form-card{padding:20px 16px}.field-grid{gap:10px}.field-grid label{font-size:11px}.field-grid input,.field-grid select{font-size:11px;padding:10px 8px;min-height:44px}.preview-side{padding:18px;min-height:520px}.preview-title>span{display:inline}.phone-wrap{width:230px}.preview-foot{margin-top:8px;padding-top:13px}.phone-text strong{font-size:28px}.section-note{display:none}.draft-grid{grid-template-columns:1fr}.draft-card{padding:15px}.draft-card p{min-height:auto}.editor-card,.storyboard-card{padding:19px 15px}.settings-section{grid-template-columns:1fr;padding:21px}.footer{flex-wrap:wrap;gap:10px}.footer span:nth-child(2){display:none}}
 
+
+/* Kostenlose, eigenständige deutsche Content-Playbooks */
+.playbooks-section{scroll-margin-top:22px;margin:24px 0 34px}
+.playbooks-top{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;flex-wrap:wrap;margin-bottom:20px}
+.playbooks-top h2{font-family:Outfit,Arial,sans-serif;font-size:clamp(1.4rem,3vw,2rem);line-height:1.2;margin:8px 0}
+.playbooks-top p{color:var(--muted);line-height:1.6;max-width:680px}
+.playbooks-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:18px}
+.playbook-tab{appearance:none;text-align:left;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:13px 10px;border-radius:12px;font:inherit;cursor:pointer;min-height:95px;transition:background .15s,border-color .15s}
+.playbook-tab span{color:var(--primary);font-size:12px;font-weight:800}.playbook-tab strong{font-weight:700;font-size:13px;line-height:1.35}
+.playbook-tab[aria-selected="true"]{border-color:var(--primary);background:rgba(174,154,245,.15);box-shadow:0 0 0 1px rgba(174,154,245,.16)}
+.playbook-workspace{border:1px solid var(--line);border-radius:15px;background:var(--panel);padding:23px;min-width:0}
+.playbook-workspace h3{font-size:1.3rem;line-height:1.3;margin:4px 0 9px}.playbook-workspace .pb-intro{color:var(--muted);line-height:1.6;margin:0 0 16px}
+.playbook-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.playbook-workspace h4{font-size:14px;margin:12px 0 10px}
+.pb-steps{padding-left:22px;color:var(--text);line-height:1.55}.pb-steps li{padding:0 0 10px}
+.pb-checks{display:grid;gap:10px}
+.pb-check{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.5;cursor:pointer}
+.pb-check input{margin-top:4px;accent-color:var(--primary);width:17px;height:17px;flex-shrink:0}
+.pb-prompt{width:100%;min-height:250px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);font:inherit;font-size:13px;line-height:1.6;padding:13px;resize:vertical}
+.pb-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.pb-caption{font-size:12px;line-height:1.6;color:var(--muted);margin-top:12px}
+@media(max-width:1050px){.playbooks-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:730px){.playbooks-columns,.playbook-columns{grid-template-columns:1fr}.playbooks-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.playbook-workspace{padding:16px}.playbook-tab{min-height:81px}.pb-prompt{min-height:210px}}
+
 </style></head>
 <body>
 <div class="layout">
  <aside class="sidebar"><div class="brand"><div class="brand-symbol">✳</div><div><b>CONTENT<span>FACTORY</span></b><small>CREATIVE WORKSPACE</small></div></div>
-  <div class="side-caption">WORKSPACE</div><nav><a href="#studio" class="nav active"><span>◈</span> Studio <i>01</i></a><a href="#drafts" class="nav"><span>▤</span> Entwürfe</a><a href="#media" class="nav"><span>▧</span> Medien</a><a href="#settings" class="nav"><span>⚙</span> Einstellungen</a></nav>
+  <div class="side-caption">WORKSPACE</div><nav><a href="#studio" class="nav active"><span>◈</span> Studio <i>01</i></a><a href="#playbooks" class="nav"><span>▣</span> Playbooks</a><a href="#drafts" class="nav"><span>▤</span> Entwürfe</a><a href="#media" class="nav"><span>▧</span> Medien</a><a href="#settings" class="nav"><span>⚙</span> Einstellungen</a></nav>
   <div class="sidebar-tip"><div class="tip-icon">✦</div><strong>Weniger Aufwand.<br/>Mehr Content.</strong><p>Eine Idee. Drei Konzepte. Fertig zum Weiterbearbeiten.</p></div>
   <div class="side-footer"><div class="avatar">FR</div><div><strong>Mein Workspace</strong><small>Lokale Entwürfe</small></div><span>⌄</span></div>
  </aside>
@@ -52,6 +76,33 @@
       </div>
       <p class="subtle" id="freeVideoHint" role="status">Schritte: Text kopieren → KI-Demo öffnen → dort selbst ein Bild hochladen und den Text einsetzen → fertigen Clip herunterladen → hier importieren. Dein Bild wird nicht automatisch hochgeladen.</p>
       <p class="export-note"><b>Wirklich 0 € für die Gratisnutzung, aber nicht unbegrenzt:</b> Hugging Face ZeroGPU bietet kostenlosen Konten derzeit rund fünf GPU-Minuten pro Tag. Warteschlangen, zeitweise Ausfälle und begrenzte Clip-Längen sind möglich. Eine automatische, unbegrenzte Video-KI direkt in unserem Cloudflare Worker wäre ohne eigene GPU oder bezahlten Rechendienst nicht realistisch. Prüfe vor gewerblicher Veröffentlichung die Bedingungen der jeweiligen Demo.</p>
+    </section>
+    
+    <section id="playbooks" class="playbooks-section">
+     <div class="playbooks-top">
+      <div><span class="card-overline">CONTENT-STRATEGIE · 100 % KOSTENLOS</span><h2>5 Content-Playbooks auf Deutsch</h2>
+       <p>Konkrete Arbeitsvorlagen für kreative Werbung und mehr Reichweite. Wähle einen Bereich, passe den Prompt an und übernimm eine Idee ins Studio. Die Vorlagen selbst benötigen keine KI-API.</p></div>
+      <span class="version-tag">5 VORLAGEN · DEUTSCH</span>
+     </div>
+     <div id="playbookTabs" class="playbooks-tabs" role="tablist" aria-label="Content-Playbooks auswählen"></div>
+     <div class="playbook-workspace" id="playbookDetail" role="tabpanel" aria-label="Ausgewähltes Content-Playbook">
+      <span class="card-overline" id="playbookCategory"></span>
+      <h3 id="playbookTitle"></h3><p id="playbookIntro" class="pb-intro"></p>
+      <div class="playbook-columns">
+       <div><h4>So setzt du es um</h4><ol id="playbookSteps" class="pb-steps"></ol>
+        <h4>Checkliste</h4><div id="playbookChecks" class="pb-checks"></div></div>
+       <div><h4>Dein bearbeitbarer Prompt</h4>
+        <textarea class="pb-prompt" id="playbookPrompt" aria-label="Bearbeitbarer Playbook-Prompt" spellcheck="true"></textarea>
+        <div class="pb-actions">
+         <button type="button" class="primary-btn" id="playbookCopy">⧉ Prompt kopieren</button>
+         <button type="button" class="outline-btn" id="playbookToStudio">↗ Idee ins Studio übernehmen</button>
+         <button type="button" class="outline-btn" id="playbookRefresh">⟳ An Thema anpassen</button>
+        </div>
+        <div id="playbookFeedback" class="pb-caption" role="status" aria-live="polite">Die Vorlagen sind frei bearbeitbar. Eine tatsächliche Video-KI ist dafür nicht enthalten.</div>
+       </div>
+      </div>
+     </div>
+     <p class="pb-caption">Eigenständig formulierte deutschsprachige Arbeitsvorlagen, angeregt durch die fünf Themen von <a href="https://demonugc.netlify.app/" target="_blank" rel="noopener noreferrer">DemonUGC</a>. Keine Übernahme fremder Volltexte und keine Verbindung zum Anbieter.</p>
     </section>
     <section class="results-section" id="drafts"><div class="section-title"><div><span class="number">02</span><h2>Deine Konzepte</h2></div><span class="section-note" id="resultsHint">Noch keine Entwürfe erstellt</span></div>
       <div class="empty-results" id="emptyResults"><div class="empty-symbol">✳</div><h3>Der nächste gute Beitrag beginnt hier.</h3><p>Beschreibe oben dein Thema, um drei verschiedene Varianten zu erhalten.</p></div>
@@ -412,6 +463,106 @@ $('freeVideoImportInput').onchange=e=>{
  else $('freeVideoHint').textContent='Bitte einen heruntergeladenen Videoclip (MP4/WebM) auswählen.';
  e.target.value='';
 };
+
+
+/* Eigenständige deutsche Content-Arbeitsvorlagen – lokal im Browser */
+const CONTENT_PLAYBOOKS=[
+ {
+  id:'ugc',short:'KI-UGC',title:'KI-gestützte UGC-Werbung',category:'01 · Glaubwürdige Werbevideos',
+  intro:'Entwickle kurze Werbeclips im Stil persönlicher Empfehlungen: ein konkretes Problem, eine ehrliche Demonstration und ein klarer nächster Schritt. Keine erfundenen Bewertungen oder vorgetäuschten echten Kundenerfahrungen.',
+  steps:['Wähle eine konkrete Alltagssituation deiner Zielgruppe.','Beginne mit einer Frage oder einem sichtbaren Problem in den ersten zwei Sekunden.','Zeige eine nachvollziehbare Anwendung oder Demonstration statt übertriebener Versprechen.','Schließe mit einer eindeutigen, freundlichen Handlungsaufforderung.'],
+  checks:['Keine falschen Kundenbewertungen oder Erfahrungen behauptet','Verwendete Kundentiere nur mit Erlaubnis gezeigt','Vorteile nachvollziehbar statt unbelegt formuliert','Format 9:16, gut lesbare Untertitel und eindeutiger Aufruf'],
+  idea:'Einen natürlichen 20-Sekunden-UGC-Clip über schonende Fellpflege drehen: kurzer Problem-Hook, echte Pflegeszene, ehrliches Ergebnis, Termin-CTA.',
+  prompt:({brand,topic,audience,platform})=>`Du entwickelst einen glaubwürdigen deutschsprachigen UGC-Werbeclip für ${brand}. Thema: ${topic}. Zielgruppe: ${audience}. Plattform: ${platform}. Erstelle eine 20-Sekunden-Story mit (1) Hook in 2 Sekunden, (2) konkreter Alltagssituation, (3) realistischer Demonstration, (4) freundlichem CTA. Gib ein Shot-by-Shot-Storyboard mit Bildinhalt, Sprechertext und Untertitel pro Szene sowie einen natürlichen Beitragstext aus. Keine erfundenen Testimonials, kein unrealistisches Ergebnis, keine fingierte Kundenperspektive. Empfohlene echte Aufnahmen deutlich von KI-generierten Szenen unterscheiden.`
+ },
+ {
+  id:'variants',short:'Varianten testen',title:'Erfolgreiche Beiträge systematisch variieren',category:'02 · Aus einem guten Beitrag mehrere machen',
+  intro:'Bewahre die Hauptidee eines erfolgreichen Beitrags und teste nur einzelne Elemente. So findest du heraus, welche Hooks, Formate und Handlungsaufforderungen funktionieren – ohne Erfolg zu garantieren.',
+  steps:['Suche einen eigenen Beitrag mit messbaren Signalen wie Anfragen oder Wiedergabedauer.','Behalte Kernaussage und Bildmaterial möglichst konstant.','Erstelle drei unterschiedliche Einstiege: Frage, überraschende Beobachtung, konkreter Nutzen.','Vergleiche die Varianten anhand desselben Ziels und halte die Ergebnisse fest.'],
+  checks:['Ausgangspunkt und Ziel dokumentiert','Pro Variante nur einen zentralen Faktor geändert','Keine fremden Clips oder geschützten Inhalte ungefragt übernommen','Ergebnisse mit Reichweite, Aufrufen oder Anfragen verglichen'],
+  idea:'Drei Reel-Varianten zur Golden-Retriever-Fellpflege erstellen und unterschiedliche Hooks testen.',
+  prompt:({brand,topic,audience,platform})=>`Entwickle für ${brand} drei unterscheidbare Versionen eines vorhandenen ${platform}-Beitrags zum Thema ${topic} für ${audience}. Variante A soll mit einer Frage einsteigen, Variante B mit einem konkreten Pflegefehler oder Missverständnis, Variante C mit einem positiven Ergebnis. Halte Kernaussage und Angebotsversprechen konstant. Gib je Variante Hook, 3-Szenen-Storyboard, Sprechertext, Caption, CTA und die eine Variable, die getestet wird. Ergänze eine einfache Tabelle zur Auswertung von Reichweite, Wiedergabedauer und Kundenanfragen. Keine Erfolgsgarantie.`
+ },
+ {
+  id:'funnels',short:'Anfragen gewinnen',title:'Vom Beitrag zur Kundenanfrage',category:'03 · Einfacher Marketing-Funnel',
+  intro:'Plane den Weg vom ersten Kontakt bis zur konkreten Anfrage. Für ein lokales Unternehmen zählen dabei Vertrauen, klare Leistungen und eine unkomplizierte Terminmöglichkeit; für Apps eher Installation und Einstieg.',
+  steps:['Definiere genau eine Aktion, die Menschen nach dem Beitrag ausführen sollen.','Formuliere ein klares Nutzenversprechen ohne versteckte Kosten.','Zeige im Beitrag, was vor der Kontaktaufnahme bekannt sein sollte.','Vereinfache das Ziel: Kontakt, Buchung, Anmeldung oder Einstieg.'],
+  checks:['Ein primäres Ziel und eine eindeutige CTA gewählt','Angebot, Leistungen und Konditionen verständlich dargestellt','Kontaktweg beziehungsweise Buchung funktioniert','Keine unnötigen personenbezogenen Daten abgefragt'],
+  idea:'30-Sekunden-Reel erstellen, das eine häufige Frage beantwortet und zu einer unverbindlichen Pflegeanfrage führt.',
+  prompt:({brand,topic,audience,platform})=>`Du planst einen verständlichen Marketing-Funnel für ${brand} mit ${platform} als Einstieg. Thema: ${topic}. Zielgruppe: ${audience}. Entwickle eine Struktur aus Aufmerksamkeit (Hook), Vertrauen (Belege und ehrliche Darstellung), Nutzen (konkrete Leistung) und einer klaren nächsten Aktion. Gib das Storyboard für ein 25-Sekunden-Video, den Beitragstext, eine CTA-Formulierung sowie einen Vorschlag für eine passende Landingpage oder Kontaktseite aus. Für ein lokales Unternehmen priorisiere Anfragen statt App-Installationen. Keine erfundenen Zahlen oder Versprechen.`
+ },
+ {
+  id:'organic',short:'Organische Reichweite',title:'Reichweite ohne Werbebudget aufbauen',category:'04 · Planen, veröffentlichen, lernen',
+  intro:'Erstelle wiederkehrende Content-Formate, die Menschen tatsächlich nützen. Nicht der tägliche Verkaufspost, sondern eine Mischung aus Hilfestellung, Einblicken und konkreten Angeboten schafft Anlass zum Folgen.',
+  steps:['Sammle die fünf häufigsten Fragen deiner Zielgruppe.','Wandle jede Frage in einen kurzen Beitrag mit einer einzigen Kernbotschaft um.','Verteile Wissensclips, Einblicke und Angebote auf eine realistische Woche.','Lies Rückfragen und Kommentare und nutze sie für neue Themen.'],
+  checks:['Jeder Beitrag behandelt nur eine verständliche Kernfrage','Untertitel und Vorschaubild mobil gut lesbar','Keine Engagement-Tricks, gekauften Interaktionen oder Spam','Neue Ideen anhand echter Rückfragen gesammelt'],
+  idea:'Fünf kurze Wochenbeiträge über Fellpflege, Hausbesuche und typische Pflegefragen für Hundebesitzer planen.',
+  prompt:({brand,topic,audience,platform})=>`Erstelle einen kostenfreien organischen 7-Tage-Contentplan für ${brand}, Zielgruppe ${audience}, bevorzugte Plattform ${platform}. Schwerpunkt: ${topic}. Gib fünf konkrete Beiträge mit Titel, Hook, kurzer Szene für ein vertikales Video, authentischem Sprechertext, Handlungsaufforderung und passenden deutschsprachigen Hashtags. Mischung: zwei Tipps, ein Blick hinter die Kulissen, eine häufige Frage und ein ruhiger Angebotsbeitrag. Priorisiere echte Relevanz statt Clickbait und achte auf umsetzbaren Aufwand.`
+ },
+ {
+  id:'motion',short:'Motion Graphics',title:'Animierte Grafiken professionell planen',category:'05 · Hochwertige Textanimationen',
+  intro:'Nutze klare Typografie, Bewegung und starke Bildkompositionen für Erklärvideos, Leistungsübersichten oder Produktvorstellungen. Gute Motion Graphics brauchen keine künstlich animierten Fotos und sind klar von generativer Video-KI zu unterscheiden.',
+  steps:['Wähle eine einzige Aussage pro kurzer Szene.','Lege zwei Schriften, ruhige Kontraste und einen wiederkehrenden Farbakzent fest.','Nutze Animationen nur, wenn sie Informationen verständlicher machen.','Prüfe, ob jede Szene ohne Ton und auf dem Smartphone lesbar ist.'],
+  checks:['Alle Texte bleiben innerhalb sicherer 9:16-Bildränder','Logo vollständig und unverzerrt eingebunden','Textanimationen nicht zu schnell und kontrastreich genug','Export in 1080 × 1920 mit korrektem Bildausschnitt geprüft'],
+  idea:'Elegantes 15-Sekunden-Motion-Graphic über mobile Tierpflege mit Leistungen, Pfotenmotiv, dezenter Animation und Kontakt-CTA.',
+  prompt:({brand,topic,audience,platform})=>`Entwirf ein hochwertiges Motion-Graphics-Konzept für ${brand}: ${topic}. Zielgruppe ${audience}, Ausgabe ${platform} im vertikalen Format 1080 × 1920. Gestalte ein Storyboard mit fünf kurzen Szenen, minimalistischer Typografie, klaren Bewegungsrichtungen, dezenten Übergängen, sicheren Bildrändern, vollständigem Logo und einem ruhigen CTA. Liefere je Szene Dauer, Einblendung, visuelle Bewegung und Bildsprache. Keine verpixelten Logos, keine zu großen Schriftzüge, kein unpassender Bildzuschnitt. Dies ist animierte Grafik, kein neues KI-generiertes Realvideo.`
+ }
+];
+let activePlaybook='ugc';
+function playbookContext(){
+ const raw=$('topic').value.trim();
+ return {
+  brand:(BRAND_PRESETS[$('brand').value]||BRAND_PRESETS.other).name,
+  topic:raw||($('brand').value==='pets'?'Schonende Fellpflege beim Golden Retriever':'ein aktuelles Projekt'),
+  audience:$('audience').value.trim()||'interessierte Menschen',
+  platform:$('platform').value
+ };
+}
+function playbookChecked(id){try{return JSON.parse(localStorage.getItem('contentfactory-playbooks-checks-v1')||'{}')[id]||[]}catch{return []}}
+function storePlaybookCheck(id,index,checked){
+ try{
+  const obj=JSON.parse(localStorage.getItem('contentfactory-playbooks-checks-v1')||'{}');
+  const arr=Array.isArray(obj[id])?obj[id]:[];
+  obj[id]=Array.from(new Set(checked?[...arr,index]:arr.filter(x=>x!==index)));
+  localStorage.setItem('contentfactory-playbooks-checks-v1',JSON.stringify(obj));
+ }catch{}
+}
+function renderPlaybook(id){
+ const pb=CONTENT_PLAYBOOKS.find(p=>p.id===id)||CONTENT_PLAYBOOKS[0];activePlaybook=pb.id;
+ $('playbookTabs').innerHTML=CONTENT_PLAYBOOKS.map((x,i)=>`<button type="button" class="playbook-tab" role="tab" aria-selected="${x.id===pb.id}" data-pbid="${esc(x.id)}"><span>${String(i+1).padStart(2,'0')}</span><strong>${esc(x.short)}</strong></button>`).join('');
+ $('playbookTabs').querySelectorAll('[data-pbid]').forEach(b=>b.onclick=()=>renderPlaybook(b.dataset.pbid));
+ $('playbookCategory').textContent=pb.category;
+ $('playbookTitle').textContent=pb.title;
+ $('playbookIntro').textContent=pb.intro;
+ $('playbookSteps').innerHTML=pb.steps.map(step=>`<li>${esc(step)}</li>`).join('');
+ const saved=playbookChecked(pb.id);
+ $('playbookChecks').innerHTML=pb.checks.map((c,i)=>`<label class="pb-check"><input type="checkbox" data-pbcheck="${i}" ${saved.includes(i)?'checked':''}><span>${esc(c)}</span></label>`).join('');
+ $('playbookChecks').querySelectorAll('[data-pbcheck]').forEach(cb=>cb.onchange=()=>storePlaybookCheck(pb.id,Number(cb.dataset.pbcheck),cb.checked));
+ $('playbookPrompt').value=pb.prompt(playbookContext());
+ $('playbookFeedback').textContent='Die Vorlage ist an das aktuelle Projekt und Thema angepasst und kann beliebig verändert werden.';
+}
+async function copyPlaybookPrompt(){
+ const prompt=$('playbookPrompt').value.trim();
+ if(!prompt){$('playbookFeedback').textContent='Schreibe zunächst einen Prompt.';return}
+ try{await navigator.clipboard.writeText(prompt);$('playbookFeedback').textContent='Prompt kopiert. Du kannst ihn in einem KI-Tool verwenden.';toast('Playbook-Prompt kopiert.')}
+ catch{
+  $('playbookPrompt').focus();$('playbookPrompt').select();
+  $('playbookFeedback').textContent='Der Text wurde markiert – bitte im Kontextmenü „Kopieren“ auswählen.';
+ }
+}
+function playbookToStudio(){
+ const pb=CONTENT_PLAYBOOKS.find(p=>p.id===activePlaybook)||CONTENT_PLAYBOOKS[0];
+ $('topic').value=pb.idea;
+ $('topic').dispatchEvent(new Event('input',{bubbles:true}));
+ $('playbookFeedback').textContent='Idee ins Studio übernommen. Du kannst das Thema dort verändern und drei Konzepte erstellen.';
+ $('studio').scrollIntoView({behavior:'smooth',block:'start'});
+ $('topic').focus({preventScroll:true});
+ toast('Playbook-Idee im Briefing eingefügt.');
+}
+$('playbookCopy').onclick=copyPlaybookPrompt;
+$('playbookToStudio').onclick=playbookToStudio;
+$('playbookRefresh').onclick=()=>renderPlaybook(activePlaybook);
+renderPlaybook('ugc');
 
 $('generatorForm').addEventListener('submit',generate);
 const zone=$('media');zone.onclick=()=> $('mediaInput').click();zone.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('mediaInput').click()}};
