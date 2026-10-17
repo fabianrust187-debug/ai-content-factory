@@ -7,7 +7,7 @@ Mobile-first Content-Studio für Social-Media-Konzepte, Bild-/Videouploads, Stor
 - Drei **unterschiedliche** deutschsprachige Content-Konzepte pro Thema – ohne API-Schlüssel durch nachvollziehbare Textvorlagen.
 - Optional **echte KI-Texte** via serverseitiger Cloudflare-Worker-Schnittstelle und OpenAI-API.
 - **Kostenloses Vorlesen** auf Deutsch mit der integrierten Gerätestimme des Browsers (ohne API-Schlüssel; nur Wiedergabe, kein Export).
-- **Kostenlose Piper-TTS-WAV-Generierung direkt im Browser** (Kerstin/Thorsten) über `@mintplex-labs/piper-tts-web@1.0.5` von einem ESM-CDN; erstes Laden benötigt größere ONNX-/WASM-Dateien und kann je nach Mobilgerät scheitern. Die WAV-Datei wird als Sprecherstimme im Entwurf verwendet und kann heruntergeladen werden.
+- **Kostenlose Piper-TTS-WAV-Generierung direkt im Browser** (Thorsten Medium/High mit 256 Phonemsymbolen) über eine lokal gebündelte Variante von `@mintplex-labs/piper-tts-web@1.0.5`; erstes Laden benötigt größere ONNX-/WASM-Dateien und kann je nach Mobilgerät scheitern. Die WAV-Datei wird als Sprecherstimme im Entwurf verwendet und kann heruntergeladen werden.
 - Optional OpenAI-TTS im Cloudflare-Worker-Backend vorhanden, die normale Oberfläche verwendet standardmäßig **keine** kostenpflichtige Sprachgenerierung.
 - Upload von Bildern und Videos (Dateien werden im Browser verarbeitet, nicht auf den Server hochgeladen).
 - Editierbare Titel, Sprechertexte, Posts und Szenen-Captions.
@@ -43,6 +43,11 @@ npx wrangler secret put STUDIO_ACCESS_KEY
 Optional per `wrangler.jsonc` oder Secrets `AI_MODEL`, `TTS_MODEL`, `TTS_VOICE` anpassen. Standard: `gpt-4.1-mini`, `gpt-4o-mini-tts`, `coral`. Diese API-Nutzung kann Kosten verursachen.
 
 
+### Piper: alter Fehler mit Lautsymbol 140 behoben
+- Die alten deutschen Piper-Low-Stimmen **Kerstin low** und **Thorsten low** verwenden nur 130 Lautsymbole. Die Phonemisierung kann aber Index **140** (z. B. beim deutschen „ch“) erzeugen; ONNX wirft dann den Fehler `/enc_p/emb/Gather`. Das ist für Piper in [rhasspy/piper#104](https://github.com/rhasspy/piper/issues/104) dokumentiert.
+- Die Oberfläche verwendet deshalb nur noch **Thorsten medium** (Standard) und **Thorsten high** (größer), mit jeweils **256** Symbolen. Konfigurationsdateien mit weniger als 154 Symbolen werden **vor dem ONNX-Lauf** abgelehnt. Es werden keine Lautsymbole einfach abgeschnitten, da das die Sprache verfälschen würde.
+- Erfolgreiche Bereitstellung und Modellkompatibilität garantieren allein noch keine erfolgreiche Audioerzeugung auf jedem Android-Gerät; unbedingt kurzen Sprachtest im Browser durchführen.
+
 ### Piper: browsergerechter ONNX-Build (Android-Fix)
 
 - Der frühere direkte CDN-Import von Piper lieferte in mobilen Browsern die fehlerhafte ONNX-WebAssembly-Initialisierung `I.dirname is not a function`. Deshalb werden Piper `1.0.5` und ONNX Runtime Web `1.18.0` jetzt mit Vite als **Browser-Bundle** erzeugt.
@@ -63,8 +68,8 @@ Optional per `wrangler.jsonc` oder Secrets `AI_MODEL`, `TTS_MODEL`, `TTS_VOICE` 
 
 ### Piper: kostenloser WAV-Export und Netzwerkdiagnose
 
-- Die Browser-App lädt Piper bei Bedarf über einen ESM-CDN, mit einem zweiten CDN als Alternative.
-- **Die drei freigegebenen deutschen Modelle** Kerstin low, Thorsten low und Thorsten medium sowie die WASM-Laufzeiten laufen über die Worker-Routen `/api/piper-model/…` und `/api/piper-runtime/…`, um Probleme mit direkten Drittanbieter-Downloads auf mobilen Browsern zu verringern.
+- Die Browser-App verwendet den lokal gebündelten, browsergerechten Piper-Code aus `/vendor/piper-tts.js`, ohne einen externen ESM-CDN zur Laufzeit.
+- **Die zwei freigegebenen deutschen Modelle** Thorsten medium und Thorsten high sowie die WASM-Laufzeiten laufen über die Worker-Routen `/api/piper-model/…` und `/api/piper-runtime/…`, um Probleme mit direkten Drittanbieter-Downloads auf mobilen Browsern zu verringern.
 - `GET /api/piper-check` prüft mit HEAD-Anfragen, ob Cloudflare Modell-Metadaten und beide Laufzeitquellen erreichen kann. **Ein grüner Diagnosewert beweist nicht, dass Piper auf jedem Handy läuft oder dass komplette Modell-Downloads und Inferenz funktionieren.**
 - Das Download-Modell kann über 60 MB groß sein und lokal zwischengespeichert werden. Mehrere Versuche benötigen ausreichend freies WLAN-Datenvolumen und Speicher. Die App zeigt getrennte Fehlermeldungen für den Bibliotheksdownload, Modell-/Laufzeitdownload und Synthese.
 - Die Gerätestimme zum direkten Vorlesen bleibt ohne Piper-Bibliothek verfügbar, kann aber nicht in eine WAV-Datei exportiert werden.
