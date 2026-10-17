@@ -1,0 +1,13 @@
+{
+  "name": "ai-content-factory-studio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Mobile-first, AI-optional content studio on Cloudflare Workers",
+  "scripts": {
+    "preview": "python3 -m http.server 8080 -d public",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test tests/*.test.mjs"
+  }
+}
