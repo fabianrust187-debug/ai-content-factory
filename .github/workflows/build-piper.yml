@@ -1,0 +1,36 @@
+name: Build Piper browser runtime
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-piper.yml'
+      - 'package.json'
+      - 'src/piper-entry.js'
+      - 'vite.config.js'
+
+permissions:
+  contents: write
+
+jobs:
+  browser-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install and build browser-only ONNX runtime
+        run: npm install --no-audit --no-fund
+      - name: Ensure browser runtime exists
+        run: test -s public/vendor/piper-tts.js
+      - name: Commit generated runtime files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f public/vendor
+          if ! git diff --staged --quiet; then
+            git commit -m "Build pinned Piper browser runtime bundle"
+            git push
+          fi
