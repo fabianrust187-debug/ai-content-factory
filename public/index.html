@@ -30,11 +30,21 @@
 @media(max-width:1050px){.playbooks-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:730px){.playbooks-columns,.playbook-columns{grid-template-columns:1fr}.playbooks-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.playbook-workspace{padding:16px}.playbook-tab{min-height:81px}.pb-prompt{min-height:210px}}
 
+
+.video-presets{display:grid;gap:12px;padding:14px;background:rgba(174,154,245,.07);border:1px solid rgba(174,154,245,.22);border-radius:14px}
+.video-presets label{font-size:13px;line-height:1.5}
+.video-presets select{display:block;width:100%;margin-top:7px;min-width:0}
+.video-preset-modes{display:flex;gap:8px;flex-wrap:wrap}
+.video-preset-modes button{flex:1 1 175px}
+.video-preset-modes button[aria-pressed="true"]{border-color:var(--primary);background:rgba(174,154,245,.16);color:var(--text)}
+#videoPromptSummary{line-height:1.55}
+@media(max-width:620px){.video-presets{padding:11px}.video-preset-modes button{flex:1 1 100%}}
+
 </style></head>
 <body>
 <div class="layout">
  <aside class="sidebar"><div class="brand"><div class="brand-symbol">✳</div><div><b>CONTENT<span>FACTORY</span></b><small>CREATIVE WORKSPACE</small></div></div>
-  <div class="side-caption">WORKSPACE</div><nav><a href="#studio" class="nav active"><span>◈</span> Studio <i>01</i></a><a href="#playbooks" class="nav"><span>▣</span> Playbooks</a><a href="#drafts" class="nav"><span>▤</span> Entwürfe</a><a href="#media" class="nav"><span>▧</span> Medien</a><a href="#settings" class="nav"><span>⚙</span> Einstellungen</a></nav>
+  <div class="side-caption">WORKSPACE</div><nav><a href="#studio" class="nav active"><span>◈</span> Studio <i>01</i></a><a href="#freeVideoStudio" class="nav"><span>▸</span> KI-Videos</a><a href="#playbooks" class="nav"><span>▣</span> Playbooks</a><a href="#drafts" class="nav"><span>▤</span> Entwürfe</a><a href="#media" class="nav"><span>▧</span> Medien</a><a href="#settings" class="nav"><span>⚙</span> Einstellungen</a></nav>
   <div class="sidebar-tip"><div class="tip-icon">✦</div><strong>Weniger Aufwand.<br/>Mehr Content.</strong><p>Eine Idee. Drei Konzepte. Fertig zum Weiterbearbeiten.</p></div>
   <div class="side-footer"><div class="avatar">FR</div><div><strong>Mein Workspace</strong><small>Lokale Entwürfe</small></div><span>⌄</span></div>
  </aside>
@@ -65,17 +75,28 @@
 
     <section class="card" id="freeVideoStudio" style="margin:20px 0 30px;padding:24px;display:grid;gap:14px">
       <div><span class="card-overline">ECHTE VIDEO-KI · 0 € · BEGRENZTES TAGESKONTINGENT</span><h2 style="font-size:clamp(1.3rem,2.3vw,1.8rem);margin:8px 0">KI-Videos statt Fotodiashows</h2>
-      <p class="subtle">Ein frei zugängliches Wan2.2-Modell animiert ein echtes Foto zu einer neuen Videosequenz. Unsere App hilft dir bei der Vorbereitung und übernimmt den fertigen Clip anschließend in den Videoeditor.</p></div>
+      <p class="subtle">Sieben professionelle, bearbeitbare Videoregie-Prompts für Pfotenparadies Rust – inspiriert von authentischem UGC. Die 30-Sekunden-Fassung richtet sich an geeignete Videomodelle; die 6-Sekunden-Fassung hilft beim Testen begrenzter Gratis-Demos. Hier werden noch keine Videos direkt berechnet.</p></div>
+      <div class="video-presets" id="videoPresets">
+ <label>Professionelle Pfotenparadies-Videovorlagen
+  <select id="videoPromptPreset" aria-label="Eine von sieben Pfotenparadies-Videovorlagen wählen"><option value="ugc">01 · UGC-Selfie: Die mobile Hundefriseurin</option><option value="golden">02 · Golden Retriever: glänzendes Fell</option><option value="spitz">03 · Zwergspitz: liebevolle Pflege</option><option value="asmr">04 · Fellpflege-ASMR: ganz nah</option><option value="mobile">05 · Hausbesuch: Wir kommen zu dir</option><option value="faq">06 · Ein häufiger Fellpflege-Irrtum</option><option value="before">07 · Mini-Vorher/Nachher ohne Tricks</option></select>
+ </label>
+ <div class="video-preset-modes" role="group" aria-label="Länge der Szenenbeschreibung">
+  <button type="button" class="outline-btn" id="videoPromptLong" aria-pressed="true">30 Sekunden · kompletter Prompt</button>
+  <button type="button" class="outline-btn" id="videoPromptShort" aria-pressed="false">6 Sekunden · Gratis-Test</button>
+ </div>
+ <div id="videoPromptSummary" class="subtle" role="status" aria-live="polite"></div>
+ </div>
       <label>Szenenbeschreibung für die Video-KI<textarea id="freeVideoPrompt" rows="5" style="min-height:130px">Photorealistic cinematic video of a beautiful Golden Retriever being gently brushed during professional grooming, natural golden fur moving, friendly groomer, soft daylight, elegant camera motion, realistic anatomy, premium pet care advertisement, vertical 9:16, no titles, no watermarks.</textarea></label>
       <div style="display:flex;gap:9px;flex-wrap:wrap">
         <button type="button" class="outline-btn" id="freeVideoFromTopic">✦ Szene aus Thema vorbereiten</button>
         <button type="button" class="outline-btn" id="freeVideoCopyPrompt">⧉ Text kopieren</button>
         <a class="primary-btn" style="display:inline-flex;align-items:center;text-decoration:none" href="https://huggingface.co/spaces/zerogpu-aoti/wan2-2-fp8da-aoti-faster" target="_blank" rel="noopener noreferrer">↗ Kostenlosen KI-Videogenerator öffnen</a>
+        <a class="outline-btn" style="display:inline-flex;align-items:center;text-decoration:none" href="https://kling.ai/" target="_blank" rel="noopener noreferrer">↗ Kling AI öffnen · Credits prüfen</a>
         <button type="button" class="outline-btn" id="freeVideoImport">↓ Fertiges KI-Video importieren</button>
         <input id="freeVideoImportInput" type="file" accept="video/*" hidden>
       </div>
       <p class="subtle" id="freeVideoHint" role="status">Schritte: Text kopieren → KI-Demo öffnen → dort selbst ein Bild hochladen und den Text einsetzen → fertigen Clip herunterladen → hier importieren. Dein Bild wird nicht automatisch hochgeladen.</p>
-      <p class="export-note"><b>Wirklich 0 € für die Gratisnutzung, aber nicht unbegrenzt:</b> Hugging Face ZeroGPU bietet kostenlosen Konten derzeit rund fünf GPU-Minuten pro Tag. Warteschlangen, zeitweise Ausfälle und begrenzte Clip-Längen sind möglich. Eine automatische, unbegrenzte Video-KI direkt in unserem Cloudflare Worker wäre ohne eigene GPU oder bezahlten Rechendienst nicht realistisch. Prüfe vor gewerblicher Veröffentlichung die Bedingungen der jeweiligen Demo.</p>
+      <p class="export-note"><b>0 € bleibt die Vorgabe:</b> Die Vorlagen und Piper-Vertonung sind kostenlos. Die externe Wan-Demo kann kostenfreie Nutzung mit Wartezeiten oder Kontingenten anbieten; Kling 4.0 ist nicht automatisch kostenlos. Keine Bestellung oder Zahlung durch diese Website. 30-Sekunden-Video und deutsche Dialoge sind modellabhängig; für kostenlose 6-Sekunden-Generierung die Kurzfassung wählen. KI-Szenen vor Veröffentlichung als solche kennzeichnen, keine fiktiven Kundenstimmen als echte ausgeben und gewerbliche Nutzungsrechte des Generators prüfen.</p>
     </section>
     
     <section id="playbooks" class="playbooks-section">
@@ -437,6 +458,86 @@ function drawFrame(ctx,time,d,media,realW=1080,realH=1920,fit='contain'){
 async function exportVideo(){const d=draft();if(!d)return;if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){toast('Dein Browser unterstützt den Export nicht.');return}const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm;codecs=vp8','video/webm'].find(m=>MediaRecorder.isTypeSupported(m));if(!mime){toast('Der Browser kann kein WebM schreiben.');return}const btn=$('exportVideo');setBusy(btn,true,'Video wird vorbereitet …');let ctxAudio=null,audio=null,stream=null;try{const media=await prepareMedia();const canvas=document.createElement('canvas');canvas.width=$('exportResolution').value==='720'?720:1080;canvas.height=Math.round(canvas.width*16/9);const ctx=canvas.getContext('2d',{alpha:false});if(!ctx)throw new Error('Canvas nicht verfügbar');stream=canvas.captureStream(24);for(const m of media){if(m.kind==='video')m.element.play().catch(()=>{})}if(state.voice){audio=document.createElement('audio');audio.src=state.voice.url;audio.preload='auto';audio.loop=false;await new Promise(res=>{audio.oncanplay=()=>res();audio.onerror=()=>res();setTimeout(res,1500)});try{ctxAudio=new AudioContext();const source=ctxAudio.createMediaElementSource(audio);const destination=ctxAudio.createMediaStreamDestination();source.connect(destination);destination.stream.getAudioTracks().forEach(track=>stream.addTrack(track));await ctxAudio.resume()}catch{toast('Audiospur nicht verfügbar. Es wird ohne Stimme exportiert.');if(ctxAudio){ctxAudio.close().catch(()=>{});ctxAudio=null}audio=null}}
  const chunks=[];const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:canvas.width===1080?8500000:4400000});recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};const done=new Promise((res,rej)=>{recorder.onstop=res;recorder.onerror=()=>rej(new Error('Aufnahme fehlgeschlagen'))});const start=performance.now();let timer;drawFrame(ctx,0,d,media,canvas.width,canvas.height,$('fitMode').value);recorder.start(500);audio?.play().catch(()=>toast('Audio konnte nicht gestartet werden.'));
  await new Promise((res,rej)=>{const step=()=>{const elapsed=(performance.now()-start)/1000;drawFrame(ctx,Math.min(elapsed,d.duration-.02),d,media,canvas.width,canvas.height,$('fitMode').value);$('renderStatus').textContent=`Export läuft: ${Math.min(100,Math.floor(elapsed/d.duration*100))} %`;if(elapsed>=d.duration){res();return}timer=requestAnimationFrame(step)};timer=requestAnimationFrame(step)});cancelAnimationFrame(timer);recorder.stop();await done;audio?.pause();const result=new Blob(chunks,{type:mime});if(!result.size)throw new Error('Videodatei ist leer');download(fileName('webm'),result);$('renderStatus').textContent=`Fertig: ${canvas.width} × ${canvas.height} · ${(result.size/1024/1024).toFixed(1)} MB · WebM (animierte Medien, keine KI-Szenen)` ;toast('Video erfolgreich exportiert.');}catch(err){$('renderStatus').textContent='Export fehlgeschlagen.';toast(err.message||'Export fehlgeschlagen')}finally{audio?.pause();ctxAudio?.close().catch(()=>{});stream?.getTracks().forEach(t=>t.stop());setBusy(btn,false)}}
+
+
+const PFOTEN_KLING_PROMPTS=[
+ {
+  "id": "ugc",
+  "title": "01 · UGC-Selfie: Die mobile Hundefriseurin",
+  "short": "Direkter, glaubwürdiger Handy-Look",
+  "summary": "Ein durchgehender Smartphone-Take beim Hausbesuch, mit natürlicher deutscher Ansprache und einem entspannten Golden Retriever.",
+  "long": "Photorealistic vertical 9:16 smartphone front-camera video, ONE continuous 30-second take without edits, depicting a fictional mobile dog groomer at a client's bright Hamburg-style living room. It must look like an ordinary genuine phone recording, not a polished advertisement: mild phone compression, slight autofocus breathing, subtle handheld shake, deep focus, soft daylight from the side, natural skin texture, ordinary furniture, no perfect studio lighting. The groomer is a friendly adult woman in practical neutral work clothes; she is an ACTOR in a fictional promotional demonstration, not an actual customer or documented visit. A relaxed Golden Retriever sits safely on a nonslip mat next to a brush kit. Timeline: 0–5 s the groomer looks at the front camera at arm's length while the dog casually sniffs the edge of the frame; 5–10 s she tilts the phone toward the dog's coat to show a harmless loose tuft; 10–16 s she uses her free hand to demonstrate a light, slow brushing stroke on the back, pausing when the dog turns its head; 16–22 s the dog stretches and leans comfortably toward her, genuine unscripted-feeling movement; 22–27 s she turns the phone back to herself and smiles; 27–30 s the dog gently nudges the phone with its nose, creating an imperfect natural ending. Spoken German, close phone-mic voice, conversational pace: \"Viele fragen uns: Muss Fellpflege eigentlich stressig sein? Nein. Wir nehmen uns Zeit, lassen den Hund erst ankommen und arbeiten ganz behutsam. Und das Beste: Wir kommen zu euch nach Hause.\" Natural room ambience: nails on floor, soft coat-brushing, faint city traffic through window; NO cinematic music, NO subtitles, NO text overlays, NO logos, NO watermark. Realistic hands and dog anatomy, no sudden fur transformation, no unsafe restraint, no fabricated customer testimonials.",
+  "shortPrompt": "6-second photorealistic vertical 9:16 handheld smartphone clip in an ordinary sunlit apartment. Fictional mobile dog groomer gently brushes a calm Golden Retriever on a nonslip mat, dog sniffs the brush and relaxes. Slight phone-camera shake, natural indoor sound and moving fur, true-to-life anatomy, candid unedited feeling. No subtitles, text, logos, watermark or miraculous transformations."
+ },
+ {
+  "id": "golden",
+  "title": "02 · Golden Retriever: glänzendes Fell",
+  "short": "Emotionaler, hochwertiger Hundemoment",
+  "summary": "Kamerafahrt durch eine ruhige Fellpflegeszene mit feinen Fellbewegungen, Tageslicht und sichtbar schonender Arbeitsweise.",
+  "long": "Ultra-realistic cinematic 9:16 thirty-second single-scene documentary of a fictional Golden Retriever receiving gentle coat care in the living room of a warm private home. The dog has stable anatomy, expressive brown eyes, a natural healthy golden double coat and consistent identity for the whole video. Not a staged grooming salon; this is a mobile dog care home visit. Camera follows one smooth believable handheld motion, mostly 35 mm lens equivalent with a few carefully motivated changes in framing, shallow but realistic depth of field, natural bounced window light and warm neutral colors. 0–5 s a quiet wide view establishes the cozy room with a groomer's compact bag beside a nonslip mat; 5–11 s the dog rises, stretches naturally and approaches the groomer at its own pace; 11–18 s camera moves close as a soft slicker brush runs slowly over the dog's outer coat without snagging, individual strands shifting naturally; 18–23 s the groomer switches to a gentle comb and inspects a small section while the dog turns its ears toward a distant sound; 23–27 s a close-up of calm face and blinking eyes; 27–30 s dog places chin on a comfortable cushion while the groomer's hand rests nearby. Very subtle ASMR sounds: brushing, dog breath, quiet paws, a faint bird outside. Optional gentle professional female German narration, not a testimonial: \"Gute Fellpflege beginnt mit Ruhe, Geduld und einem Blick auf das, was jeder Hund braucht.\" Avoid noisy overlays, text, artificial glitter, oversized logos, uncanny anatomy, instant makeover, exaggerated obedience or dog discomfort. Commercial-quality visual, believable home service.",
+  "shortPrompt": "Photorealistic 6-second vertical video, cozy living room during a mobile dog grooming visit. A calm Golden Retriever sits on a nonslip mat while a groomer makes two gentle brush strokes across natural golden fur. Slow intimate camera push-in, moving individual hair strands, daylight from a window, quiet brush and breathing audio, consistent anatomy. No text, logo, dramatic makeover or watermarks."
+ },
+ {
+  "id": "spitz",
+  "title": "03 · Zwergspitz: liebevolle Pflege",
+  "short": "Flauschiges Nahporträt auf Augenhöhe",
+  "summary": "Sanfte Pflege eines kleinen Spitzes mit natürlichen Reaktionen und hochwertiger Makrooptik.",
+  "long": "Authentic 30-second vertical 9:16 pet-care documentary shot inside a bright quiet home, following a FICTIONAL fluffy adult Pomeranian dog, cream-orange coat, small black nose, expressive eyes and consistent body proportions. This is a generic Pomeranian character, NOT intended to portray a real dog or falsely document a real appointment. Mobile groomer works at floor level on a nonslip mat, not on a high table. Camera begins low at the dog's eye height, with restrained shallow depth of field, natural daylight and slight handheld human imperfections. Timeline: 0–5 s the Pomeranian pads toward the groomer's open hand, gently sniffs; 5–10 s the groomer presents a soft brush and waits while the dog examines it; 10–18 s gentle short strokes through a small section of outer fur, no pulling on tangles, coat lifting and settling believably; 18–23 s dog pauses and calmly looks toward the window, groomer respectfully stops brushing; 23–27 s the groomer checks a small section of coat with fingertips; 27–30 s a spontaneous head tilt and subtle tail wag, quiet finish. Close honest sound of gentle strokes, small paws on mat, birds outside. Optional soft authentic German narration from the groomer: \"Kleine Hunde brauchen genauso viel Geduld. Wir richten uns nach dem Tempo des Hundes und gehen ganz behutsam vor.\" No unnecessary scissors near eyes, no forced restraint, no staged customer review, no captions, no advertising labels, no on-screen text, no watermark, no exaggerated cartoon fur.",
+  "shortPrompt": "6-second portrait 9:16 realistic mobile grooming scene. A small cream Pomeranian on a nonslip mat in a quiet home gently sniffs a soft grooming brush, then accepts one slow comfortable stroke on its fluffy coat. Dog remains anatomically consistent, subtle natural movement and ear twitch, soft sunlight, believable fur and breathing audio. No text, watermark or dramatic transformation."
+ },
+ {
+  "id": "asmr",
+  "title": "04 · Fellpflege-ASMR: ganz nah",
+  "short": "Detailreicher Sound und natürliche Textur",
+  "summary": "Ein ruhiger ASMR-Clip mit Bürstengeräuschen und natürlichen Fellstrukturen, ohne Sprache.",
+  "long": "A 30-second unedited photorealistic vertical 9:16 macro-ASMR recording of a gentle dog brushing routine during a mobile grooming home visit. The subject is one relaxed Golden Retriever; the dog's back and relaxed face remain recognizable, with anatomically correct coat, visible individual hairs and stable coloring. The room is ordinary, sunlit and quiet; the camera is a close smartphone with convincing autofocus shifts but no excessive cinematic effects. 0–5 s: the groomer lays a clean, soft brush beside a folded towel and the dog sniffs it naturally. 5–13 s: close view of slow, light brush strokes along the back, real hair movement, individual strands catching daylight. 13–19 s: brush is lifted for a pause as dog exhales and its ears flick slightly. 19–25 s: careful combing of a small, accessible outer-coat section without pulling or removing clumps. 25–30 s: camera rises gently to the dog's calm face as it blinks and sighs. Audio is the focus: intimate textured bristle-on-fur sound, occasional faint collar jingle, dog breathing, fabric rustle; recorded-room dynamics, no music, no voice and no artificial swooshes. No tools near sensitive eyes, no exaggerated shedding, no forced movements, no logos or text, no subtitles, no watermark. Natural anatomy, physically plausible fur simulation and continuous lighting.",
+  "shortPrompt": "6-second vertical 9:16 close macro ASMR footage of a soft grooming brush moving slowly across the healthy golden fur of one relaxed Golden Retriever. Visible individual hair strands react naturally, subtle authentic brushing noise and dog breathing, warm window daylight, handheld phone focus adjustment. No voice, music, subtitles, logos or watermarks."
+ },
+ {
+  "id": "mobile",
+  "title": "05 · Hausbesuch: Wir kommen zu dir",
+  "short": "Mobile Tierpflege authentisch zeigen",
+  "summary": "Ein freundlicher Hausbesuch statt eines erfundenen Salons – vom Ankommen bis zur ersten entspannten Pflegesituation.",
+  "long": "High-end yet candid 30-second vertical 9:16 advertisement-style documentary showing a FICTIONAL mobile grooming visit in a Hamburg apartment. Do not create a storefront, salon sign, branded uniform print, fake business identity, or customer endorsement. Same adult groomer, same friendly medium-sized dog and same realistic compact grooming bag throughout, continuity preserved. Start in the hallway, natural handheld gimbal steadiness, warm clean color without beauty filters. 0–5 s: groomer enters the open doorway carrying a small practical grooming kit, greeted by a dog wagging gently near its owner; owner remains mostly out of frame and is a fictional extra. 5–10 s: groomer kneels to let the dog smell an open hand and the brush, no sudden contact. 10–16 s: she unpacks a towel, soft brush and comb on a nonslip mat in the living room; natural hand and object motion. 16–24 s: one comfortable slow brushing sequence as the dog stays relaxed and shifts position naturally; groomer follows the dog rather than restraining it. 24–30 s: friendly wave from the groomer as the calm dog glances into camera; end on a clean, inviting visual that leaves safe empty space for a REAL brand logo to be added later in the editor. Optional natural German explanatory narration by a neutral adult female voice: \"Fellpflege zu Hause? Wir bringen das passende Zubehör mit und nehmen uns Zeit für deinen Hund.\" Real hallway footsteps, dog nails, fabric rustle and room ambience. No app-generated readable labels, no fabricated customer testimonial, no guarantee of outcomes, no subtitles, no fake logos, no watermark.",
+  "shortPrompt": "6-second vertical cinematic-realistic handheld clip: a fictional mobile groomer enters a bright apartment doorway carrying a compact grooming bag and kneels to greet a friendly dog that approaches voluntarily to sniff her hand. Natural tail motion, room light and friendly candid atmosphere, consistent people and animal anatomy. No logo, captions or watermark."
+ },
+ {
+  "id": "faq",
+  "title": "06 · Ein häufiger Fellpflege-Irrtum",
+  "short": "Expertenwissen kurz und glaubwürdig",
+  "summary": "Kurzer informativer Clip zur regelmäßigen, sanften Pflege, ohne falsche medizinische Behauptungen.",
+  "long": "A natural 30-second one-take educational vertical 9:16 phone video featuring a fictional adult mobile dog-care professional explaining a common coat-care misconception during a comfortable home visit. A calm Golden Retriever rests next to the presenter on a nonslip mat. The camera is a phone on a low tripod at dog's eye height, imperfect auto-exposure, small background apartment details remain visible and realistically textured; no studio lighting or plastic skin. 0–5 s presenter faces the camera and asks a friendly question; 5–11 s points to a soft brush, allowing dog to sniff; 11–20 s gently brushes a small section of the dog's coat, pausing when the dog moves; 20–26 s gestures to the dog's relaxed posture and smiles; 26–30 s concludes naturally as dog nudges her sleeve. Spoken German, genuinely conversational with brief pauses and no robotic tone: \"Muss man einen Hund nur bürsten, wenn das Fell schon verfilzt? Lieber regelmäßig und vorsichtig, passend zur Fellart. Und wenn dein Hund eine Pause braucht, bekommt er sie. Wir schauen uns jeden Hund individuell an.\" Room sound from built-in phone mic, slight dog breath and gentle brushing, no elaborate soundtrack. Nonmedical practical guidance only; do not depict painful de-matting, overclaim results or fake customer footage. No captions, floating text, watermark or invented logo.",
+  "shortPrompt": "6-second authentic vertical phone video of a fictional mobile groomer in an ordinary apartment showing a soft dog brush to the camera, then gently demonstrating one stroke on a relaxed Golden Retriever. Natural German speech: \"Sanft und regelmäßig – immer passend zum Hund.\" Real phone ambience, no captions, no logo, no watermark."
+ },
+ {
+  "id": "before",
+  "title": "07 · Mini-Vorher/Nachher ohne Tricks",
+  "short": "Ehrliche Veränderung in einer Einstellung",
+  "summary": "Eine nachvollziehbare kleine Verbesserung der Fellordnung – keine magische Komplettverwandlung.",
+  "long": "Photorealistic 30-second vertical 9:16 continuous handheld single-take mobile grooming demonstration in the same home interior, featuring one calm, consistent Golden Retriever. The story shows a subtle realistic change in a small section of outer coat after gentle brushing, NOT a dramatic makeover and NEVER a transformation of the dog's identity or breed. Phone starts on a medium shot, then moves closer with slight realistic shake. 0–5 s groomer points to a mildly ruffled but healthy section of fur on the dog's upper back, dog comfortable on a nonslip mat. 5–10 s she offers a soft brush to smell and waits for the dog's calm reaction. 10–23 s three or four slow gentle strokes smooth the small area, fur shifts realistically with no impossible mass shedding, tangled hair removal or sudden color changes. 23–27 s camera pans a few centimeters to compare the brushed area with adjacent unbrushed fur in the SAME continuous shot; subtle improvement visible, no split screen. 27–30 s the dog turns toward camera and tail swishes; groomer gives a light approving smile. Close phone audio includes true coat-brushing, dog breath and small clothing sounds. Warm authentic home daylight, commercial-quality framing without overprocessing. Optional German line, soft and careful: \"Schon ein paar sanfte Bürstenstriche können das Fell ordentlicher aussehen lassen – immer mit Ruhe und Rücksicht auf den Hund.\" No fake testimonials, no unnatural makeover, no text, no captions, no watermark, no logo.",
+  "shortPrompt": "6-second uncut vertical photorealistic clip: close-up of Golden Retriever's gently ruffled healthy outer fur in a bright home, groomer makes three light brush strokes to smooth a small area while dog remains relaxed. The coat change is subtle and physically plausible; no abrupt transformation, breed change or fake before-and-after cut. Natural brush sound; no on-screen text, logos or watermark."
+ }
+];
+let activePfotenPromptMode='long';
+const pfotenPromptEdits={};
+function renderPfotenVideoPreset(){
+ const selector=$('videoPromptPreset');
+ const template=PFOTEN_KLING_PROMPTS.find(p=>p.id===selector.value)||PFOTEN_KLING_PROMPTS[0];
+ const key=template.id+'|'+activePfotenPromptMode;
+ $('freeVideoPrompt').value=Object.prototype.hasOwnProperty.call(pfotenPromptEdits,key)?pfotenPromptEdits[key]:template[activePfotenPromptMode==='long'?'long':'shortPrompt'];
+ $('videoPromptSummary').textContent=template.short+' – '+template.summary+' '+(activePfotenPromptMode==='long'?'30-Sekunden-Drehbuch; der externe Generator muss diese Länge unterstützen.':'6-Sekunden-Kurzfassung für Gratis-Demos mit kürzeren Clips.');
+ $('videoPromptLong').setAttribute('aria-pressed',String(activePfotenPromptMode==='long'));
+ $('videoPromptShort').setAttribute('aria-pressed',String(activePfotenPromptMode==='short'));
+ $('freeVideoHint').textContent='Vorlage ausgewählt. Prompt bearbeiten oder kopieren; für echte Generierung externes Video-KI-Angebot öffnen. Der Import des fertig erzeugten Videos funktioniert hier im Studio.';
+}
+$('videoPromptPreset').onchange=renderPfotenVideoPreset;
+$('videoPromptLong').onclick=()=>{activePfotenPromptMode='long';renderPfotenVideoPreset()};
+$('videoPromptShort').onclick=()=>{activePfotenPromptMode='short';renderPfotenVideoPreset()};
+$('freeVideoPrompt').addEventListener('input',()=>{
+ const key=$('videoPromptPreset').value+'|'+activePfotenPromptMode;
+ pfotenPromptEdits[key]=$('freeVideoPrompt').value;
+});
+renderPfotenVideoPreset();
 
 function freeVideoPromptFromTopic(){
  const topic=String($('topic').value||'').trim().slice(0,500).replaceAll('\n',' ');
