@@ -200,6 +200,68 @@ function createVoice(){
  speakNext();
 }
 let piperModulePromise;
+async function loadPiperModule(){
+ if(piperModulePromise)return piperModulePromise;
+ piperModulePromise=(async()=>{
+  const sources=[
+   'https://esm.sh/@mintplex-labs/piper-tts-web@1.0.5?bundle&deps=onnxruntime-web@1.18.0',
+   'https://esm.run/@mintplex-labs/piper-tts-web@1.0.5'
+  ];
+  const failures=[];
+  for(const source of sources){
+   try{
+    const mod=await import(/* webpackIgnore: true */ source);
+    if(typeof mod.TtsSession?.create==='function'||typeof mod.predict==='function')return mod;
+    failures.push('Bibliothek meldet keine Sprachfunktion: '+new URL(source).hostname);
+   }catch(err){failures.push(new URL(source).hostname+': '+String(err?.message||err).slice(0,90))}
+  }
+  throw new Error('Die Piper-Bibliothek konnte von keinem der beiden Anbieter geladen werden ('+failures.join('; ')+').');
+ })().catch(e=>{piperModulePromise=null;throw e});
+ return piperModulePromise;
+}
+async function withPiperModelProxy(callback){
+ // Only Piper's German voice-model URLs are routed through the same-origin Worker.
+ // All unrelated requests keep the browser's original fetch behavior.
+ const nativeFetch=window.fetch;
+ const sourceRoot='https://huggingface.co/diffusionstudio/piper-voices/resolve/main/';
+ window.fetch=async function(input,init){
+  const url=typeof input==='string'?input:input instanceof URL?input.href:input?.url;
+  if(typeof url==='string'&&url.startsWith(sourceRoot)){
+   const m=url.match(/\/(de_DE-(?:kerstin-low|thorsten-low|thorsten-medium))\.onnx(\.json)?(?:\?.*)?$/);
+   if(!m)throw new Error('Nicht unterstütztes Piper-Sprachmodell.');
+   const response=await nativeFetch.call(window,'/api/piper-model/'+m[1]+'.onnx'+(m[2]||''),init);
+   if(!response.ok){
+    const info=await response.json().catch(()=>({}));
+    throw new Error('Sprachmodell-Download fehlgeschlagen: '+(info.error||response.status)+' (HTTP '+response.status+', '+m[1]+').');
+   }
+   return response;
+  }
+  return nativeFetch.call(this,input,init);
+ };
+ try{return await callback()}
+ finally{window.fetch=nativeFetch}
+}
+async function explainPiperConnectivity(stage,error){
+ const prefix={
+  'Bibliothek':'Bibliotheksdownload',
+  'Sprachmodell':'Sprachmodell oder Piper-Laufzeit',
+  'Synthese':'Audioerstellung'
+ }[stage]||stage;
+ let message=prefix+' fehlgeschlagen: '+String(error?.message||error||'unbekannter Fehler');
+ if(/networkerror|failed to fetch/i.test(message)){
+  message+=' – Es konnte eine benötigte Datei nicht geladen werden.';
+ }
+ try{
+  const r=await fetch('/api/piper-check',{signal:AbortSignal.timeout(16000)});
+  if(r.ok){
+   const j=await r.json();
+   const failed=(j.sources||[]).filter(x=>!x.ok);
+   if(failed.length)message+=' Verbindungstest: '+failed.map(x=>x.name+' (HTTP '+x.status+')').join(', ')+'.';
+   else if(stage==='Bibliothek')message+=' Der Cloudflare-Downloadtest war erfolgreich, die externe Browser-Bibliothek ist möglicherweise blockiert.';
+  }
+ }catch{}
+ return message.slice(0,800);
+}
 async function piperGenerate(){
  const script=draft()?.script?.trim();
  if(!script){toast('Bitte zuerst einen Entwurf mit Sprechertext auswählen.');return}
@@ -207,28 +269,47 @@ async function piperGenerate(){
  const button=$('piperGenerate'),label=$('piperStatus');
  setBusy(button,true,'Piper wird vorbereitet …');
  $('piperDownload').hidden=true;
+ let stage='Bibliothek';
  try{
-  label.textContent='Lade Piper für den Browser. Keine kostenpflichtige API nötig …';
-  piperModulePromise ||= import('https://esm.sh/@mintplex-labs/piper-tts-web@1.0.5?bundle').catch(error=>{piperModulePromise=null;throw error});
-  const tts=await piperModulePromise;
-  if(typeof tts.predict!=='function')throw new Error('Die Piper-Bibliothek wurde nicht korrekt geladen.');
+  label.textContent='Schritt 1/3: Lade die kostenlose Piper-Bibliothek …';
+  const tts=await loadPiperModule();
   const voiceId=$('piperVoice').value;
-  const result=await tts.predict({text:script,voiceId},progress=>{
+  stage='Sprachmodell';
+  label.textContent='Schritt 2/3: Lade deutsche Stimme und Sprachmodell über Cloudflare …';
+  const onProgress=progress=>{
    if(progress&&typeof progress.loaded==='number'&&typeof progress.total==='number'&&progress.total>0){
-    label.textContent='Piper-Modell laden: '+Math.min(100,Math.round(progress.loaded/progress.total*100))+' %';
-   }else label.textContent='Piper lädt oder berechnet die WAV-Datei …';
+    label.textContent='Sprachmodell wird geladen: '+Math.min(100,Math.round(progress.loaded/progress.total*100))+' %';
+   }else label.textContent='Piper lädt das Sprachmodell …';
+  };
+  // The library normally fetches Hugging Face models cross-origin, which
+  // can be blocked on mobile. Our allowlisted Worker serves them same-origin.
+  const result=await withPiperModelProxy(async()=>{
+   if(typeof tts.TtsSession?.create!=='function')throw new Error('Piper-Bibliothek unterstützt keine eigenen Laufzeitpfade.');
+   if(tts.TtsSession._instance&&tts.TtsSession._instance.voiceId!==voiceId){
+    tts.TtsSession._instance=null;
+   }
+   const session=await tts.TtsSession.create({
+    voiceId,progress:onProgress,
+    wasmPaths:{
+     onnxWasm:location.origin+'/api/piper-runtime/onnx/',
+     piperData:location.origin+'/api/piper-runtime/piper_phonemize.data',
+     piperWasm:location.origin+'/api/piper-runtime/piper_phonemize.wasm'
+    }
+   });
+   stage='Synthese';
+   label.textContent='Schritt 3/3: Erzeuge deutsche WAV-Sprecherstimme …';
+   return session.predict(script);
   });
   const wav=result instanceof Blob?result:new Blob([result],{type:'audio/wav'});
-  if(!wav.size||wav.size<100)throw new Error('Piper hat keine gültigen Audiodaten geliefert.');
+  if(!wav.size||wav.size<100)throw new Error('Piper hat keine gültige Audiodatei erzeugt.');
   audioFile(new File([wav],'sprecherstimme-piper.wav',{type:'audio/wav'}));
   $('piperDownload').href=state.voice.url;
   $('piperDownload').hidden=false;
   label.textContent='Fertig! WAV-Datei erstellt und dem Video-Entwurf hinzugefügt. Jetzt abspielen oder herunterladen.';
   toast('Kostenlose WAV-Sprecherstimme erstellt.');
  }catch(err){
-  const message=String(err?.message||err||'unbekannter Fehler').slice(0,250);
-  label.textContent='Piper konnte auf diesem Gerät nicht gestartet werden: '+message+'. Die kostenlose Vorlesefunktion darüber bleibt verfügbar.';
-  toast('Piper derzeit nicht verfügbar. Siehe Hinweis unter WAV erstellen.');
+  label.textContent=await explainPiperConnectivity(stage,err);
+  toast('Piper fehlgeschlagen. Die Diagnose steht unter „WAV erstellen“.');
  }finally{setBusy(button,false)}
 }
 function drawRounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
