@@ -3,16 +3,15 @@ const json=(value,status=200)=>new Response(JSON.stringify(value),{status,header
 function authorize(req,env){const token=req.headers.get('X-Studio-Key')||'';return typeof env.STUDIO_ACCESS_KEY==='string'&&env.STUDIO_ACCESS_KEY.length>=16&&token===env.STUDIO_ACCESS_KEY}
 function text(v,max=1500){return String(v??'').replace(/[\u0000-\u001F\u007F]/g,' ').trim().slice(0,max)}
 const PIPER_MODELS = Object.freeze({
- 'de_DE-kerstin-low':'de/de_DE/kerstin/low/de_DE-kerstin-low.onnx',
- 'de_DE-thorsten-low':'de/de_DE/thorsten/low/de_DE-thorsten-low.onnx',
- 'de_DE-thorsten-medium':'de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx'
+ 'de_DE-thorsten-medium':'de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx',
+ 'de_DE-thorsten-high':'de/de_DE/thorsten/high/de_DE-thorsten-high.onnx'
 });
 const PIPER_HF_BASE='https://huggingface.co/diffusionstudio/piper-voices/resolve/main/';
 const PIPER_DATA_BASE='https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/';
 const PIPER_ONNX_BASE='https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.18.0/';
 async function piperStatusCheck(){
  const urls=[
-  ['Modell-Konfiguration',PIPER_HF_BASE+PIPER_MODELS['de_DE-kerstin-low']+'.json'],
+  ['Modell-Konfiguration',PIPER_HF_BASE+PIPER_MODELS['de_DE-thorsten-medium']+'.json'],
   ['Piper-Laufzeit',PIPER_DATA_BASE+'piper_phonemize.data'],
   ['ONNX-Laufzeit',PIPER_ONNX_BASE+'ort-wasm-simd.wasm']
  ];
