@@ -3,6 +3,17 @@
 Mobile-first Content-Studio für Social-Media-Konzepte, Bild-/Videouploads, Storyboards, Untertitel und Video-Export.
 
 
+## Sieben Video-KI-Prompts für Pfotenparadies Rust
+
+Im Bereich **KI-Videos** unter `/#freeVideoStudio` gibt es sieben detaillierte Werbevideo-Vorlagen: UGC-Selfie beim Hausbesuch, Golden-Retriever-Fellpflege, Zwergspitz-Porträt, ASMR, mobiler Hausbesuch, Wissensclip und realistischer Vorher/Nachher-Vergleich.
+
+- Jede Vorlage ist ein **eigenständiger englischer Prompt** für realistische generative Videomodelle (z. B. Kling oder eine Wan-Demo), bei Bedarf mit **deutschen Dialogen**.
+- Die längere Variante spezifiziert **30 Sekunden** mit Zeitmarken, Licht, Kamera, Bewegungen und Umgebungsgeräuschen. Eine **6-Sekunden-Kurzfassung** ist für Dienste mit kürzerer Gratis-Ausgabe vorbereitet.
+- Per Auswahlfeld und den Schaltflächen **„30 Sekunden“** / **„6 Sekunden“** wechseln; bearbeiten, mit **„Text kopieren“** übernehmen, einen externen Videogenerator öffnen und fertige MP4/WebM-Clips wieder importieren.
+- Änderungen an den Prompt-Texten bleiben beim Umschalten der Vorlagen **während des aktiven Tabs** erhalten; es erfolgt kein automatischer Upload. Bereits vorhandener Content-Factory-Videoschnitt und kostenlose Piper-Stimme bleiben unverändert.
+- Die geschilderten Pflegeszenen sind **synthetische Demonstrationen**, keine tatsächlichen Pfotenparadies-Termine oder Kundenaussagen. Besonders vor gewerblicher Veröffentlichung korrekte Kennzeichnung und Nutzungsrechte des externen Generators prüfen.
+- **Kosten:** Prompts und Bearbeitung kostenlos. Externe Videodienste (einschließlich Kling 4.0) bieten nicht automatisch kostenfreie 30-Sekunden-Generierung; die kostenfreie Verfügbarkeit ist dienst- und kontingentabhängig. Die Cloudflare-App löst keine externe KI-Generierung aus.
+
 ## Deutschsprachige Content-Playbooks (kostenlos)
 
 Im Studio befindet sich ein eigener Bereich **Playbooks** mit fünf **eigenständig formulierten** deutschsprachigen Arbeitsvorlagen. Sie sind von den fünf öffentlichen Themen bei [DemonUGC](https://demonugc.netlify.app/) inspiriert, aber keine Übernahme oder Übersetzung der dortigen Volltexte.
