@@ -52,9 +52,8 @@
        <div class="subtle">Die Gerätestimme wird direkt abgespielt, aber nicht als Audiodatei exportiert. Ihre Verfügbarkeit hängt vom Gerät ab.</div>
        <label>Piper-Stimme (kostenlose WAV-Datei)
         <select id="piperVoice">
-         <option value="de_DE-kerstin-low">Kerstin · Deutsch · weiblich (kleineres Modell)</option>
-         <option value="de_DE-thorsten-low">Thorsten · Deutsch · männlich (kleineres Modell)</option>
-         <option value="de_DE-thorsten-medium">Thorsten · Deutsch · männlich (bessere Qualität)</option>
+         <option value="de_DE-thorsten-medium">Thorsten · Deutsch · natürlich (empfohlen)</option>
+         <option value="de_DE-thorsten-high">Thorsten · Deutsch · hohe Qualität (größeres Modell)</option>
         </select>
        </label>
        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -64,7 +63,7 @@
         <a id="piperDownload" class="outline-btn" style="text-decoration:none" download="sprecherstimme-piper.wav" hidden>WAV herunterladen</a>
        </div>
        <progress id="piperProgress" max="100" style="width:100%;height:12px;accent-color:#9f87ce" hidden aria-label="Piper-Fortschritt"></progress>
-       <p class="subtle" id="piperStatus" role="status" aria-live="polite">Kostenlos und ohne OpenAI. Starte zuerst „Kurzen Test sprechen“. Das Modell wird bei der ersten Verwendung heruntergeladen (rund 60 MB). Die eigentliche Sprachberechnung läuft anschließend abschnittsweise im Hintergrund, mit Fortschritt und Abbruchmöglichkeit.</p>
+       <p class="subtle" id="piperStatus" role="status" aria-live="polite">Kostenlos und ohne OpenAI. Starte zuerst „Kurzen Test sprechen“. Das Modell wird bei der ersten Verwendung heruntergeladen (je nach Stimme deutlich über 60 MB). Die eigentliche Sprachberechnung läuft anschließend abschnittsweise im Hintergrund, mit Fortschritt und Abbruchmöglichkeit.</p>
       </div>
       <label class="audio-label">Oder eigene MP3/WAV-Datei<input id="voiceInput" type="file" accept="audio/*" /></label><div id="voiceStatus" class="subtle">Noch keine Audiodatei ausgewählt.</div><audio controls id="audioPreview" hidden></audio></div>
       <div class="card storyboard-card"><span class="card-overline">SHOTLIST / STORYBOARD</span><h3>Szenenaufbau</h3><p class="subtle">Die Texte kannst du für den Videoexport direkt verändern.</p><div id="sceneEditor"></div><div class="export-box"><strong>Dein Video exportieren</strong><p>Erstellt ein vertikales Video aus deinen hochgeladenen Bildern und Clips mit Text-Overlays.</p><button class="primary-btn" id="exportVideo">▸ Video als WebM erstellen <span class="button-arrow">↗</span></button><div id="renderStatus" class="subtle"></div><div class="export-note">WebM ist ein Browserformat. Für MP4/Instagram ggf. anschließend konvertieren.</div></div></div></div></div>
