@@ -38,6 +38,21 @@
        <div class="preview-foot"><span>✧</span><p>Deine Inhalte bleiben bis zum Export auf diesem Gerät. Es erfolgt kein automatischer Upload.</p></div>
       </div>
     </section>
+
+    <section class="card" id="freeVideoStudio" style="margin:20px 0 30px;padding:24px;display:grid;gap:14px">
+      <div><span class="card-overline">ECHTE VIDEO-KI · 0 € · BEGRENZTES TAGESKONTINGENT</span><h2 style="font-size:clamp(1.3rem,2.3vw,1.8rem);margin:8px 0">KI-Videos statt Fotodiashows</h2>
+      <p class="subtle">Ein frei zugängliches Wan2.2-Modell animiert ein echtes Foto zu einer neuen Videosequenz. Unsere App hilft dir bei der Vorbereitung und übernimmt den fertigen Clip anschließend in den Videoeditor.</p></div>
+      <label>Szenenbeschreibung für die Video-KI<textarea id="freeVideoPrompt" rows="5" style="min-height:130px">Photorealistic cinematic video of a beautiful Golden Retriever being gently brushed during professional grooming, natural golden fur moving, friendly groomer, soft daylight, elegant camera motion, realistic anatomy, premium pet care advertisement, vertical 9:16, no titles, no watermarks.</textarea></label>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button type="button" class="outline-btn" id="freeVideoFromTopic">✦ Szene aus Thema vorbereiten</button>
+        <button type="button" class="outline-btn" id="freeVideoCopyPrompt">⧉ Text kopieren</button>
+        <a class="primary-btn" style="display:inline-flex;align-items:center;text-decoration:none" href="https://huggingface.co/spaces/zerogpu-aoti/wan2-2-fp8da-aoti-faster" target="_blank" rel="noopener noreferrer">↗ Kostenlosen KI-Videogenerator öffnen</a>
+        <button type="button" class="outline-btn" id="freeVideoImport">↓ Fertiges KI-Video importieren</button>
+        <input id="freeVideoImportInput" type="file" accept="video/*" hidden>
+      </div>
+      <p class="subtle" id="freeVideoHint" role="status">Schritte: Text kopieren → KI-Demo öffnen → dort selbst ein Bild hochladen und den Text einsetzen → fertigen Clip herunterladen → hier importieren. Dein Bild wird nicht automatisch hochgeladen.</p>
+      <p class="export-note"><b>Wirklich 0 € für die Gratisnutzung, aber nicht unbegrenzt:</b> Hugging Face ZeroGPU bietet kostenlosen Konten derzeit rund fünf GPU-Minuten pro Tag. Warteschlangen, zeitweise Ausfälle und begrenzte Clip-Längen sind möglich. Eine automatische, unbegrenzte Video-KI direkt in unserem Cloudflare Worker wäre ohne eigene GPU oder bezahlten Rechendienst nicht realistisch. Prüfe vor gewerblicher Veröffentlichung die Bedingungen der jeweiligen Demo.</p>
+    </section>
     <section class="results-section" id="drafts"><div class="section-title"><div><span class="number">02</span><h2>Deine Konzepte</h2></div><span class="section-note" id="resultsHint">Noch keine Entwürfe erstellt</span></div>
       <div class="empty-results" id="emptyResults"><div class="empty-symbol">✳</div><h3>Der nächste gute Beitrag beginnt hier.</h3><p>Beschreibe oben dein Thema, um drei verschiedene Varianten zu erhalten.</p></div>
       <div id="results" hidden><div class="draft-grid" id="draftGrid"></div><div class="editor-grid"><div class="card editor-card"><div class="editor-heading"><div><span class="card-overline">AUSGEWÄHLTER ENTWURF</span><h3 id="editorTitle">Entwurf bearbeiten</h3></div><span class="draft-tag" id="draftTag">VARIANTE A</span></div><label>Videotitel<input id="editTitle" maxlength="160"/></label><label>Sprechertext<textarea id="editScript" rows="5"></textarea></label><label>Beitragstext<textarea id="editPost" rows="6"></textarea></label><div class="editor-actions"><button class="outline-btn" id="copyPost">⧉ Beitrag kopieren</button><button class="outline-btn" id="downloadSrt">↓ Untertitel (.srt)</button><button class="outline-btn" id="downloadJson">↓ Konzept (.json)</button></div><div class="voice-row"><div><strong>🎙 Sprecherstimmen · kostenlos</strong><small>Deutsch vorlesen oder mit Piper eine WAV-Datei für dein Video erstellen. Kein OpenAI-Guthaben nötig.</small></div></div>
@@ -371,6 +386,33 @@ function drawFrame(ctx,time,d,media,realW=1080,realH=1920,fit='contain'){
 async function exportVideo(){const d=draft();if(!d)return;if(!window.MediaRecorder||!HTMLCanvasElement.prototype.captureStream){toast('Dein Browser unterstützt den Export nicht.');return}const mime=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm;codecs=vp8','video/webm'].find(m=>MediaRecorder.isTypeSupported(m));if(!mime){toast('Der Browser kann kein WebM schreiben.');return}const btn=$('exportVideo');setBusy(btn,true,'Video wird vorbereitet …');let ctxAudio=null,audio=null,stream=null;try{const media=await prepareMedia();const canvas=document.createElement('canvas');canvas.width=$('exportResolution').value==='720'?720:1080;canvas.height=Math.round(canvas.width*16/9);const ctx=canvas.getContext('2d',{alpha:false});if(!ctx)throw new Error('Canvas nicht verfügbar');stream=canvas.captureStream(24);for(const m of media){if(m.kind==='video')m.element.play().catch(()=>{})}if(state.voice){audio=document.createElement('audio');audio.src=state.voice.url;audio.preload='auto';audio.loop=false;await new Promise(res=>{audio.oncanplay=()=>res();audio.onerror=()=>res();setTimeout(res,1500)});try{ctxAudio=new AudioContext();const source=ctxAudio.createMediaElementSource(audio);const destination=ctxAudio.createMediaStreamDestination();source.connect(destination);destination.stream.getAudioTracks().forEach(track=>stream.addTrack(track));await ctxAudio.resume()}catch{toast('Audiospur nicht verfügbar. Es wird ohne Stimme exportiert.');if(ctxAudio){ctxAudio.close().catch(()=>{});ctxAudio=null}audio=null}}
  const chunks=[];const recorder=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:canvas.width===1080?8500000:4400000});recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};const done=new Promise((res,rej)=>{recorder.onstop=res;recorder.onerror=()=>rej(new Error('Aufnahme fehlgeschlagen'))});const start=performance.now();let timer;drawFrame(ctx,0,d,media,canvas.width,canvas.height,$('fitMode').value);recorder.start(500);audio?.play().catch(()=>toast('Audio konnte nicht gestartet werden.'));
  await new Promise((res,rej)=>{const step=()=>{const elapsed=(performance.now()-start)/1000;drawFrame(ctx,Math.min(elapsed,d.duration-.02),d,media,canvas.width,canvas.height,$('fitMode').value);$('renderStatus').textContent=`Export läuft: ${Math.min(100,Math.floor(elapsed/d.duration*100))} %`;if(elapsed>=d.duration){res();return}timer=requestAnimationFrame(step)};timer=requestAnimationFrame(step)});cancelAnimationFrame(timer);recorder.stop();await done;audio?.pause();const result=new Blob(chunks,{type:mime});if(!result.size)throw new Error('Videodatei ist leer');download(fileName('webm'),result);$('renderStatus').textContent=`Fertig: ${canvas.width} × ${canvas.height} · ${(result.size/1024/1024).toFixed(1)} MB · WebM (animierte Medien, keine KI-Szenen)` ;toast('Video erfolgreich exportiert.');}catch(err){$('renderStatus').textContent='Export fehlgeschlagen.';toast(err.message||'Export fehlgeschlagen')}finally{audio?.pause();ctxAudio?.close().catch(()=>{});stream?.getTracks().forEach(t=>t.stop());setBusy(btn,false)}}
+
+function freeVideoPromptFromTopic(){
+ const topic=String($('topic').value||'').trim().slice(0,500).replaceAll('\n',' ');
+ const brand=$('brand').value;
+ const example=brand==='pets'
+  ?'Photorealistic cinematic vertical clip: a beautiful Golden Retriever calmly receives gentle professional grooming, a careful groomer brushes the golden fur, smooth realistic motion, natural soft light, warm premium pet salon.'
+  :brand==='gaming'
+  ?'High quality cinematic vertical gaming trailer, dynamic camera motion, realistic lighting, impressive in-game scene and action.'
+  :'Photorealistic cinematic vertical promotional video, natural movement, realistic details and premium lighting.';
+ $('freeVideoPrompt').value=example+(topic?' Extra theme: '+topic+'.':'')+' Composition 9:16, coherent animation, no text, no logos, no watermarks.';
+ $('freeVideoHint').textContent='Beschreibung aus dem Thema vorbereitet. Bitte prüfen, dann kopieren.';
+}
+async function freeVideoCopyPrompt(){
+ const value=$('freeVideoPrompt').value.trim();if(!value){toast('Bitte zuerst eine Szene beschreiben.');return}
+ try{await navigator.clipboard.writeText(value);toast('Szenenbeschreibung kopiert.');$('freeVideoHint').textContent='Text kopiert. Öffne die kostenlose KI-Demo, füge den Text ein und lade dein Ausgangsbild dort bei Bedarf selbst hoch.';}
+ catch{$('freeVideoPrompt').focus();$('freeVideoPrompt').select();toast('Text markiert – bitte manuell kopieren.')}
+}
+$('freeVideoFromTopic').onclick=freeVideoPromptFromTopic;
+$('freeVideoCopyPrompt').onclick=freeVideoCopyPrompt;
+$('freeVideoImport').onclick=()=>$('freeVideoImportInput').click();
+$('freeVideoImportInput').onchange=e=>{
+ const files=Array.from(e.target.files||[]).filter(f=>f.type.startsWith('video/'));
+ if(files.length){mediaAdd(files);$('freeVideoHint').textContent=files.length+' KI-Clip(s) übernommen. Im Editor kannst du sie mit Piper vertonen und exportieren.';}
+ else $('freeVideoHint').textContent='Bitte einen heruntergeladenen Videoclip (MP4/WebM) auswählen.';
+ e.target.value='';
+};
+
 $('generatorForm').addEventListener('submit',generate);
 const zone=$('media');zone.onclick=()=> $('mediaInput').click();zone.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('mediaInput').click()}};
 zone.ondragover=e=>{e.preventDefault();zone.classList.add('dragover')};zone.ondragleave=()=>zone.classList.remove('dragover');zone.ondrop=e=>{e.preventDefault();zone.classList.remove('dragover');mediaAdd(e.dataTransfer.files)};
