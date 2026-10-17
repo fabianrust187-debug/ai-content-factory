@@ -59,9 +59,12 @@
        </label>
        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button class="primary-btn" id="piperGenerate">↓ Kostenlose WAV erstellen</button>
+        <button class="outline-btn" id="piperTest">▶ Kurzen Test sprechen</button>
+        <button class="outline-btn" id="piperCancel" disabled>■ Abbrechen</button>
         <a id="piperDownload" class="outline-btn" style="text-decoration:none" download="sprecherstimme-piper.wav" hidden>WAV herunterladen</a>
        </div>
-       <p class="subtle" id="piperStatus" role="status" aria-live="polite">Piper nutzt ein Open-Source-Modell im Browser. Beim ersten Mal müssen Modelldaten (je nach Stimme etwa 60 MB) und Laufzeitdateien geladen werden. Das kann auf dem Tablet einige Minuten dauern und benötigt ausreichend Speicher.</p>
+       <progress id="piperProgress" max="100" style="display:block;width:100%;height:12px;accent-color:#9f87ce" hidden aria-label="Piper-Fortschritt"></progress>
+       <p class="subtle" id="piperStatus" role="status" aria-live="polite">Kostenlos und ohne OpenAI. Starte zuerst „Kurzen Test sprechen“. Das Modell wird bei der ersten Verwendung heruntergeladen (rund 60 MB). Die eigentliche Sprachberechnung läuft anschließend abschnittsweise im Hintergrund, mit Fortschritt und Abbruchmöglichkeit.</p>
       </div>
       <label class="audio-label">Oder eigene MP3/WAV-Datei<input id="voiceInput" type="file" accept="audio/*" /></label><div id="voiceStatus" class="subtle">Noch keine Audiodatei ausgewählt.</div><audio controls id="audioPreview" hidden></audio></div>
       <div class="card storyboard-card"><span class="card-overline">SHOTLIST / STORYBOARD</span><h3>Szenenaufbau</h3><p class="subtle">Die Texte kannst du für den Videoexport direkt verändern.</p><div id="sceneEditor"></div><div class="export-box"><strong>Dein Video exportieren</strong><p>Erstellt ein vertikales Video aus deinen hochgeladenen Bildern und Clips mit Text-Overlays.</p><button class="primary-btn" id="exportVideo">▸ Video als WebM erstellen <span class="button-arrow">↗</span></button><div id="renderStatus" class="subtle"></div><div class="export-note">WebM ist ein Browserformat. Für MP4/Instagram ggf. anschließend konvertieren.</div></div></div></div></div>
@@ -199,118 +202,124 @@ function createVoice(){
  }
  speakNext();
 }
-let piperModulePromise;
-async function loadPiperModule(){
- if(piperModulePromise)return piperModulePromise;
- piperModulePromise=(async()=>{
-  const sources=[
-   'https://esm.sh/@mintplex-labs/piper-tts-web@1.0.5?bundle&deps=onnxruntime-web@1.18.0',
-   'https://esm.run/@mintplex-labs/piper-tts-web@1.0.5'
-  ];
-  const failures=[];
-  for(const source of sources){
-   try{
-    const mod=await import(/* webpackIgnore: true */ source);
-    if(typeof mod.TtsSession?.create==='function'||typeof mod.predict==='function')return mod;
-    failures.push('Bibliothek meldet keine Sprachfunktion: '+new URL(source).hostname);
-   }catch(err){failures.push(new URL(source).hostname+': '+String(err?.message||err).slice(0,90))}
-  }
-  throw new Error('Die Piper-Bibliothek konnte von keinem der beiden Anbieter geladen werden ('+failures.join('; ')+').');
- })().catch(e=>{piperModulePromise=null;throw e});
- return piperModulePromise;
-}
-async function withPiperModelProxy(callback){
- // Only Piper's German voice-model URLs are routed through the same-origin Worker.
- // All unrelated requests keep the browser's original fetch behavior.
- const nativeFetch=window.fetch;
- const sourceRoot='https://huggingface.co/diffusionstudio/piper-voices/resolve/main/';
- window.fetch=async function(input,init){
-  const url=typeof input==='string'?input:input instanceof URL?input.href:input?.url;
-  if(typeof url==='string'&&url.startsWith(sourceRoot)){
-   const m=url.match(/\/(de_DE-(?:kerstin-low|thorsten-low|thorsten-medium))\.onnx(\.json)?(?:\?.*)?$/);
-   if(!m)throw new Error('Nicht unterstütztes Piper-Sprachmodell.');
-   const response=await nativeFetch.call(window,'/api/piper-model/'+m[1]+'.onnx'+(m[2]||''),init);
-   if(!response.ok){
-    const info=await response.json().catch(()=>({}));
-    throw new Error('Sprachmodell-Download fehlgeschlagen: '+(info.error||response.status)+' (HTTP '+response.status+', '+m[1]+').');
-   }
-   return response;
-  }
-  return nativeFetch.call(this,input,init);
- };
- try{return await callback()}
- finally{window.fetch=nativeFetch}
+
+let activePiper = null;
+function piperCancel(){
+ if(!activePiper)return;
+ const active=activePiper;activePiper=null;
+ active.worker.terminate();
+ active.reject(Error('Abgebrochen. Du kannst einen neuen Versuch starten.'));
 }
 async function explainPiperConnectivity(stage,error){
- const prefix={
-  'Bibliothek':'Bibliotheksdownload',
-  'Sprachmodell':'Sprachmodell oder Piper-Laufzeit',
-  'Synthese':'Audioerstellung'
- }[stage]||stage;
- let message=prefix+' fehlgeschlagen: '+String(error?.message||error||'unbekannter Fehler');
- if(/networkerror|failed to fetch/i.test(message)){
-  message+=' – Es konnte eine benötigte Datei nicht geladen werden.';
- }
+ let message=String(error?.message||error||'unbekannter Fehler');
+ const prefix=stage==='Synthese'?'Audioerstellung':stage==='Sprachmodell'?'Sprachmodell oder Laufzeit':'Piper-Bibliothek';
+ message=prefix+': '+message;
+ if(/timeout|zeitüberschreitung/i.test(message))message+=' Das Tablet benötigt möglicherweise zu viel Zeit oder die Piper-Laufzeit ist hängen geblieben.';
  try{
-  const r=await fetch('/api/piper-check',{signal:AbortSignal.timeout(16000)});
+  const r=await fetch('/api/piper-check',{signal:AbortSignal.timeout(5000)});
   if(r.ok){
-   const j=await r.json();
-   const failed=(j.sources||[]).filter(x=>!x.ok);
-   if(failed.length)message+=' Verbindungstest: '+failed.map(x=>x.name+' (HTTP '+x.status+')').join(', ')+'.';
-   else if(stage==='Bibliothek')message+=' Der Cloudflare-Downloadtest war erfolgreich, die externe Browser-Bibliothek ist möglicherweise blockiert.';
+   const j=await r.json(),failed=(j.sources||[]).filter(x=>!x.ok);
+   if(failed.length)message+=' Cloudflare-Verbindungstest: '+failed.map(x=>x.name+' (HTTP '+x.status+')').join(', ')+'.';
   }
  }catch{}
- return message.slice(0,800);
+ return message.slice(0,650);
 }
-async function piperGenerate(){
+function runPiperWorker({text,voiceId,shortTest,onStage,onDownload,onPart}){
+ return new Promise((resolve,reject)=>{
+  if(activePiper){reject(Error('Piper läuft bereits. Bitte zuerst abbrechen.'));return}
+  if(!('Worker' in window)){reject(Error('Dein Browser unterstützt keine Web Worker.'));return}
+  let worker;
+  try{worker=new Worker('/piper-worker.js',{type:'module'})}
+  catch(e){reject(Error('Der Piper-Hintergrundprozess kann nicht gestartet werden: '+String(e.message||e)));return}
+  let completed=false;let idleTimer,totalTimer;
+  const clean=()=>{
+   if(completed)return;completed=true;
+   clearTimeout(idleTimer);clearTimeout(totalTimer);
+   worker.terminate();if(activePiper?.worker===worker)activePiper=null;
+  };
+  const fail=e=>{clean();reject(e instanceof Error?e:Error(String(e)))};
+  const success=audio=>{clean();resolve(audio)};
+  const resetIdle=(ms=120000)=>{
+   clearTimeout(idleTimer);
+   idleTimer=setTimeout(()=>fail(Error('Zeitüberschreitung nach '+Math.round(ms/1000)+' Sekunden ohne Rückmeldung aus der Piper-Laufzeit.')),ms);
+  };
+  activePiper={worker,reject:fail};
+  resetIdle(180000);
+  totalTimer=setTimeout(()=>fail(Error('Piper hat die Gesamtdauer von 6 Minuten überschritten. Bitte mit dem kurzen Test erneut versuchen.')),360000);
+  worker.onmessage=e=>{
+   if(completed)return;
+   const msg=e.data||{};
+   if(msg.type==='stage'){
+    resetIdle(msg.stage==='Synthese'?95000:180000);
+    onStage(msg);
+   }else if(msg.type==='download'){
+    resetIdle(180000);onDownload(msg);
+   }else if(msg.type==='partComplete'){
+    resetIdle(95000);onPart(msg);
+   }else if(msg.type==='result'&&msg.audio){
+    success(msg.audio);
+   }else if(msg.type==='error'){
+    fail(Error(msg.error||'Unbekannter Piper-Fehler.'));
+   }
+  };
+  worker.onerror=e=>{e.preventDefault?.();fail(Error('Piper-Hintergrundprozess konnte nicht ausgeführt werden ('+(e.message||'Skriptfehler')+').'))};
+  worker.onmessageerror=()=>fail(Error('Audio-Daten aus dem Piper-Hintergrundprozess konnten nicht gelesen werden.'));
+  worker.postMessage({type:'generate',text,voiceId,shortTest:!!shortTest});
+ });
+}
+async function piperGenerate(shortTest=false){
  const script=draft()?.script?.trim();
  if(!script){toast('Bitte zuerst einen Entwurf mit Sprechertext auswählen.');return}
  if(script.length>2000){$('piperStatus').textContent='Der Sprechertext ist zu lang (maximal 2.000 Zeichen).';return}
- const button=$('piperGenerate'),label=$('piperStatus');
- setBusy(button,true,'Piper wird vorbereitet …');
+ if(activePiper)return;
+ const button=$('piperGenerate'),test=$('piperTest'),cancel=$('piperCancel'),label=$('piperStatus'),bar=$('piperProgress');
+ setBusy(button,true,'Piper arbeitet …');
+ test.disabled=true;cancel.disabled=false;bar.hidden=false;bar.removeAttribute('value');
  $('piperDownload').hidden=true;
- let stage='Bibliothek';
+ let stage='Bibliothek',stageText='Lade kostenlose Sprachbibliothek …';
+ let progressMessage='';
+ const since=Date.now();
+ const timer=setInterval(()=>{
+  const elapsed=Math.floor((Date.now()-since)/1000);
+  label.textContent=stageText+(progressMessage?' – '+progressMessage:'')+' · '+elapsed+' Sek.';
+ },1500);
  try{
-  label.textContent='Schritt 1/3: Lade die kostenlose Piper-Bibliothek …';
-  const tts=await loadPiperModule();
-  const voiceId=$('piperVoice').value;
-  stage='Sprachmodell';
-  label.textContent='Schritt 2/3: Lade deutsche Stimme und Sprachmodell über Cloudflare …';
-  const onProgress=progress=>{
-   if(progress&&typeof progress.loaded==='number'&&typeof progress.total==='number'&&progress.total>0){
-    label.textContent='Sprachmodell wird geladen: '+Math.min(100,Math.round(progress.loaded/progress.total*100))+' %';
-   }else label.textContent='Piper lädt das Sprachmodell …';
-  };
-  // The library normally fetches Hugging Face models cross-origin, which
-  // can be blocked on mobile. Our allowlisted Worker serves them same-origin.
-  const result=await withPiperModelProxy(async()=>{
-   if(typeof tts.TtsSession?.create!=='function')throw new Error('Piper-Bibliothek unterstützt keine eigenen Laufzeitpfade.');
-   if(tts.TtsSession._instance&&tts.TtsSession._instance.voiceId!==voiceId){
-    tts.TtsSession._instance=null;
+  const audio=await runPiperWorker({
+   text:script,voiceId:$('piperVoice').value,shortTest,
+   onStage:m=>{
+    stage=m.stage;stageText=m.message;progressMessage='';
+    if(stage==='Synthese'){
+     bar.value=100*((m.index-1)/m.total);
+     progressMessage='Abschnitt '+m.index+' von '+m.total+' wird erstellt';
+    }else{bar.removeAttribute('value')}
+   },
+   onDownload:m=>{
+    if(m.percent!==null&&m.percent!==undefined){
+     bar.value=m.percent;
+     progressMessage='Sprachmodell: '+m.percent+' % geladen';
+    }else{bar.removeAttribute('value');progressMessage='Ladevorgang läuft'}
+   },
+   onPart:m=>{
+    bar.value=100*m.index/m.total;
+    progressMessage='Abschnitt '+m.index+' von '+m.total+' fertig';
    }
-   const session=await tts.TtsSession.create({
-    voiceId,progress:onProgress,
-    wasmPaths:{
-     onnxWasm:location.origin+'/api/piper-runtime/onnx/',
-     piperData:location.origin+'/api/piper-runtime/piper_phonemize.data',
-     piperWasm:location.origin+'/api/piper-runtime/piper_phonemize.wasm'
-    }
-   });
-   stage='Synthese';
-   label.textContent='Schritt 3/3: Erzeuge deutsche WAV-Sprecherstimme …';
-   return session.predict(script);
   });
-  const wav=result instanceof Blob?result:new Blob([result],{type:'audio/wav'});
-  if(!wav.size||wav.size<100)throw new Error('Piper hat keine gültige Audiodatei erzeugt.');
-  audioFile(new File([wav],'sprecherstimme-piper.wav',{type:'audio/wav'}));
-  $('piperDownload').href=state.voice.url;
-  $('piperDownload').hidden=false;
-  label.textContent='Fertig! WAV-Datei erstellt und dem Video-Entwurf hinzugefügt. Jetzt abspielen oder herunterladen.';
+  const wav=audio instanceof Blob?audio:new Blob([audio],{type:'audio/wav'});
+  if(!wav.size||wav.size<100)throw Error('Piper hat keine gültigen Audiodaten geliefert.');
+  audioFile(new File([wav],shortTest?'sprecherstimme-test.wav':'sprecherstimme-piper.wav',{type:'audio/wav'}));
+  $('piperDownload').href=state.voice.url;$('piperDownload').hidden=false;
+  bar.value=100;
+  label.textContent=shortTest?'Kurzer Sprachtest fertig! Die WAV-Datei ist unten abspielbar.':'WAV-Datei erstellt und dem Video-Entwurf hinzugefügt. Jetzt abspielen oder herunterladen.';
   toast('Kostenlose WAV-Sprecherstimme erstellt.');
  }catch(err){
-  label.textContent=await explainPiperConnectivity(stage,err);
-  toast('Piper fehlgeschlagen. Die Diagnose steht unter „WAV erstellen“.');
- }finally{setBusy(button,false)}
+  label.textContent='Prüfe Piper-Fehler …';
+  const msg=String(err?.message||err);
+  label.textContent=/^Abgebrochen/.test(msg)?msg:await explainPiperConnectivity(stage,err);
+  toast('Piper wurde beendet. Details stehen unter der Fortschrittsanzeige.');
+ }finally{
+  clearInterval(timer);setBusy(button,false);test.disabled=false;cancel.disabled=true;
+  if(!bar.hasAttribute('value'))bar.hidden=true;
+ }
 }
 function drawRounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
 function wrapLines(ctx,txt,width){const words=String(txt||'').split(/\s+/);const lines=[];let line='';for(const w of words){const attempt=line?line+' '+w:w;if(ctx.measureText(attempt).width>width&&line){lines.push(line);line=w}else line=attempt}if(line)lines.push(line);return lines.slice(0,8)}
@@ -333,7 +342,7 @@ $('editTitle').oninput=e=>updateEdit('title',e.target.value);$('editScript').oni
 $('copyPost').onclick=async()=>{if(!draft())return;try{await navigator.clipboard.writeText(draft().postText);toast('Beitragstext kopiert.')}catch{toast('Kopieren nicht möglich.')}};
 $('downloadSrt').onclick=()=>draft()&&downloadText(fileName('srt'),createSrt(draft().scenes));
 $('downloadJson').onclick=()=>draft()&&downloadText(fileName('json'),JSON.stringify({...draft(),exportedAt:new Date().toISOString()},null,2),'application/json');
-$('createVoice').onclick=createVoice;$('stopVoice').onclick=()=>{stopBrowserSpeech();$('voiceStatus').textContent='Vorlesen gestoppt.'};$('piperGenerate').onclick=piperGenerate;$('voiceInput').onchange=e=>{const f=e.target.files?.[0];if(f){$('piperDownload').hidden=true;audioFile(f)}};if('speechSynthesis' in window){availableBrowserVoices();window.speechSynthesis.addEventListener?.('voiceschanged',availableBrowserVoices)};
+$('createVoice').onclick=createVoice;$('stopVoice').onclick=()=>{stopBrowserSpeech();$('voiceStatus').textContent='Vorlesen gestoppt.'};$('piperGenerate').onclick=()=>piperGenerate(false);$('piperTest').onclick=()=>piperGenerate(true);$('piperCancel').onclick=piperCancel;$('voiceInput').onchange=e=>{const f=e.target.files?.[0];if(f){$('piperDownload').hidden=true;audioFile(f)}};if('speechSynthesis' in window){availableBrowserVoices();window.speechSynthesis.addEventListener?.('voiceschanged',availableBrowserVoices)};
 $('exportVideo').onclick=exportVideo;
 $('saveToken').onclick=()=>{sessionStorage.setItem('studio-key',$('studioToken').value.trim());$('studioToken').value='';toast('Zugangsschlüssel nur für diesen Tab hinterlegt.');health()};
 $('helpButton').onclick=()=>toast('Start: Thema eingeben, Konzepte erzeugen, auswählen, bearbeiten und exportieren.');
