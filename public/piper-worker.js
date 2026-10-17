@@ -4,12 +4,12 @@
  * Text is processed in small segments for visible synthesis progress.
  */
 const SOURCE_ROOT = 'https://huggingface.co/diffusionstudio/piper-voices/resolve/main/';
-const ALLOWED = new Set(['de_DE-kerstin-low','de_DE-thorsten-low','de_DE-thorsten-medium']);
+const ALLOWED = new Set(['de_DE-thorsten-medium','de_DE-thorsten-high']);
 const originalFetch = self.fetch.bind(self);
 self.fetch = async (input,init) => {
  const url = typeof input==='string'?input:input instanceof URL?input.href:input?.url;
  if(typeof url==='string'&&url.startsWith(SOURCE_ROOT)){
-  const m=url.match(/\/(de_DE-(?:kerstin-low|thorsten-low|thorsten-medium))\.onnx(\.json)?(?:\?.*)?$/);
+  const m=url.match(/\/(de_DE-thorsten-(?:medium|high))\.onnx(\.json)?(?:\?.*)?$/);
   if(!m||!ALLOWED.has(m[1]))throw Error('Nicht erlaubte Piper-Modelldatei.');
   const path='/api/piper-model/'+m[1]+'.onnx'+(m[2]||'');
   const r=await originalFetch(new URL(path,self.location.origin),init);
@@ -83,6 +83,15 @@ self.onmessage=async({data})=>{
   self.postMessage({type:'stage',stage:'Bibliothek',message:'Schritt 1/3: Piper-Bibliothek laden'});
   const tts=await loadPiper();
   self.postMessage({type:'stage',stage:'Sprachmodell',message:'Schritt 2/3: Sprachmodell und Laufzeit laden'});
+  // Older German Piper low voices contain only 130 embedding slots, yet
+  // espeak-ng generates phoneme ids such as 140 (German "ch").
+  // Reject incompatible models before ONNX synthesis (see rhasspy/piper#104).
+  const configUrl=new URL('/api/piper-model/'+voiceId+'.onnx.json',self.location.origin);
+  const configResponse=await originalFetch(configUrl);
+  if(!configResponse.ok)throw Error('Sprachmodell-Konfiguration nicht erreichbar (HTTP '+configResponse.status+').');
+  const voiceConfig=await configResponse.json();
+  if(!Number.isInteger(voiceConfig.num_symbols)||voiceConfig.num_symbols<154)
+    throw Error('Inkompatibles deutsches Piper-Sprachmodell: '+voiceConfig.num_symbols+' Lautsymbole (mindestens 154 benötigt).');
   const session=await tts.TtsSession.create({
    voiceId,
    progress:p=>{
