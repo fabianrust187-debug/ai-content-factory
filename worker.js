@@ -2,7 +2,54 @@
 const json=(value,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}});
 function authorize(req,env){const token=req.headers.get('X-Studio-Key')||'';return typeof env.STUDIO_ACCESS_KEY==='string'&&env.STUDIO_ACCESS_KEY.length>=16&&token===env.STUDIO_ACCESS_KEY}
 function text(v,max=1500){return String(v??'').replace(/[\u0000-\u001F\u007F]/g,' ').trim().slice(0,max)}
+const PIPER_MODELS = Object.freeze({
+ 'de_DE-kerstin-low':'de/de_DE/kerstin/low/de_DE-kerstin-low.onnx',
+ 'de_DE-thorsten-low':'de/de_DE/thorsten/low/de_DE-thorsten-low.onnx',
+ 'de_DE-thorsten-medium':'de/de_DE/thorsten/medium/de_DE-thorsten-medium.onnx'
+});
+const PIPER_HF_BASE='https://huggingface.co/diffusionstudio/piper-voices/resolve/main/';
+const PIPER_DATA_BASE='https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/';
+const PIPER_ONNX_BASE='https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.18.0/';
+async function piperStatusCheck(){
+ const urls=[
+  ['Modell-Konfiguration',PIPER_HF_BASE+PIPER_MODELS['de_DE-kerstin-low']+'.json'],
+  ['Piper-Laufzeit',PIPER_DATA_BASE+'piper_phonemize.data'],
+  ['ONNX-Laufzeit',PIPER_ONNX_BASE+'ort-wasm-simd.wasm']
+ ];
+ const results=await Promise.all(urls.map(async ([name,url])=>{
+  try{const r=await fetch(url,{method:'HEAD',redirect:'follow',signal:AbortSignal.timeout(12000)});return {name,status:r.status,ok:r.ok};}
+  catch(e){return {name,status:0,ok:false,error:String(e?.name||'Netzwerkfehler')};}
+ }));
+ return json({status:results.every(x=>x.ok)?'verfuegbar':'eingeschraenkt',sources:results});
+}
+async function piperAsset(req,path){
+ if(req.method!=='GET')return json({error:'Methode nicht erlaubt'},405);
+ let source;
+ const m=path.match(/^\/api\/piper-model\/([a-zA-Z0-9_-]+)\.onnx(\.json)?$/);
+ if(m&&PIPER_MODELS[m[1]])source=PIPER_HF_BASE+PIPER_MODELS[m[1]]+(m[2]||'');
+ else if(path==='/api/piper-runtime/piper_phonemize.data'||path==='/api/piper-runtime/piper_phonemize.wasm'){
+  source=PIPER_DATA_BASE+path.split('/').at(-1);
+ }else{
+  const n=path.match(/^\/api\/piper-runtime\/onnx\/(ort-wasm[a-z0-9.-]*\.(?:wasm|mjs|js))$/);
+  if(n)source=PIPER_ONNX_BASE+n[1];
+ }
+ if(!source)return json({error:'Piper-Datei nicht erlaubt'},404);
+ try{
+  const upstream=await fetch(source,{redirect:'follow',signal:AbortSignal.timeout(120000),cf:{cacheEverything:true,cacheTtl:86400}});
+  if(!upstream.ok)return json({error:'Piper-Datei konnte nicht heruntergeladen werden',status:upstream.status,resource:path.split('/').at(-1)},502);
+  const headers=new Headers({'Cache-Control':'public,max-age=86400','X-Content-Type-Options':'nosniff'});
+  headers.set('Content-Type',upstream.headers.get('Content-Type')||(path.endsWith('.json')?'application/json':path.endsWith('.wasm')?'application/wasm':'application/octet-stream'));
+  const size=upstream.headers.get('Content-Length');if(size)headers.set('Content-Length',size);
+  return new Response(upstream.body,{status:200,headers});
+ }catch(e){
+  console.warn('Piper download failure',{resource:path,error:String(e?.name||'network')});
+  return json({error:'Piper-Download über Cloudflare derzeit nicht erreichbar',resource:path.split('/').at(-1)},502);
+ }
+}
+
 export default {async fetch(req,env){const path=new URL(req.url).pathname;
+ if(path==='/api/piper-check'&&req.method==='GET')return piperStatusCheck();
+ if(path.startsWith('/api/piper-model/')||path.startsWith('/api/piper-runtime/'))return piperAsset(req,path);
  if(path==='/api/health'&&req.method==='GET')return json({aiConfigured:Boolean(env.OPENAI_API_KEY&&env.STUDIO_ACCESS_KEY),voiceConfigured:Boolean(env.OPENAI_API_KEY&&env.STUDIO_ACCESS_KEY)});
  if(path.startsWith('/api/')){
   if(req.method!=='POST')return json({error:'Methode nicht erlaubt'},405);
