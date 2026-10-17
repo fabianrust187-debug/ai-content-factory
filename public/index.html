@@ -40,7 +40,30 @@
     </section>
     <section class="results-section" id="drafts"><div class="section-title"><div><span class="number">02</span><h2>Deine Konzepte</h2></div><span class="section-note" id="resultsHint">Noch keine Entwürfe erstellt</span></div>
       <div class="empty-results" id="emptyResults"><div class="empty-symbol">✳</div><h3>Der nächste gute Beitrag beginnt hier.</h3><p>Beschreibe oben dein Thema, um drei verschiedene Varianten zu erhalten.</p></div>
-      <div id="results" hidden><div class="draft-grid" id="draftGrid"></div><div class="editor-grid"><div class="card editor-card"><div class="editor-heading"><div><span class="card-overline">AUSGEWÄHLTER ENTWURF</span><h3 id="editorTitle">Entwurf bearbeiten</h3></div><span class="draft-tag" id="draftTag">VARIANTE A</span></div><label>Videotitel<input id="editTitle" maxlength="160"/></label><label>Sprechertext<textarea id="editScript" rows="5"></textarea></label><label>Beitragstext<textarea id="editPost" rows="6"></textarea></label><div class="editor-actions"><button class="outline-btn" id="copyPost">⧉ Beitrag kopieren</button><button class="outline-btn" id="downloadSrt">↓ Untertitel (.srt)</button><button class="outline-btn" id="downloadJson">↓ Konzept (.json)</button></div><div class="voice-row"><div><strong>🎙 Sprecherstimme</strong><small>Per KI erzeugen oder eigene Audiodatei hochladen</small></div><button class="outline-btn" id="createVoice">KI-Stimme erstellen</button></div><label class="audio-label">Eigene MP3/WAV-Datei<input id="voiceInput" type="file" accept="audio/*" /></label><div id="voiceStatus" class="subtle">Noch kein Audiomaterial ausgewählt.</div><audio controls id="audioPreview" hidden></audio></div>
+      <div id="results" hidden><div class="draft-grid" id="draftGrid"></div><div class="editor-grid"><div class="card editor-card"><div class="editor-heading"><div><span class="card-overline">AUSGEWÄHLTER ENTWURF</span><h3 id="editorTitle">Entwurf bearbeiten</h3></div><span class="draft-tag" id="draftTag">VARIANTE A</span></div><label>Videotitel<input id="editTitle" maxlength="160"/></label><label>Sprechertext<textarea id="editScript" rows="5"></textarea></label><label>Beitragstext<textarea id="editPost" rows="6"></textarea></label><div class="editor-actions"><button class="outline-btn" id="copyPost">⧉ Beitrag kopieren</button><button class="outline-btn" id="downloadSrt">↓ Untertitel (.srt)</button><button class="outline-btn" id="downloadJson">↓ Konzept (.json)</button></div><div class="voice-row"><div><strong>🎙 Sprecherstimmen · kostenlos</strong><small>Deutsch vorlesen oder mit Piper eine WAV-Datei für dein Video erstellen. Kein OpenAI-Guthaben nötig.</small></div></div>
+      <div class="voice-free-panel" style="padding:14px 0;display:grid;gap:10px">
+       <label>Deutsche Gerätestimme (sofort und kostenlos)
+        <select id="browserVoice" aria-label="Deutsche Vorlesestimme"><option value="">Automatisch · Deutsch</option></select>
+       </label>
+       <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="outline-btn" id="createVoice">▶ Kostenlos vorlesen</button>
+        <button class="outline-btn" id="stopVoice">■ Stoppen</button>
+       </div>
+       <div class="subtle">Die Gerätestimme wird direkt abgespielt, aber nicht als Audiodatei exportiert. Ihre Verfügbarkeit hängt vom Gerät ab.</div>
+       <label>Piper-Stimme (kostenlose WAV-Datei)
+        <select id="piperVoice">
+         <option value="de_DE-kerstin-low">Kerstin · Deutsch · weiblich (kleineres Modell)</option>
+         <option value="de_DE-thorsten-low">Thorsten · Deutsch · männlich (kleineres Modell)</option>
+         <option value="de_DE-thorsten-medium">Thorsten · Deutsch · männlich (bessere Qualität)</option>
+        </select>
+       </label>
+       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="primary-btn" id="piperGenerate">↓ Kostenlose WAV erstellen</button>
+        <a id="piperDownload" class="outline-btn" style="text-decoration:none" download="sprecherstimme-piper.wav" hidden>WAV herunterladen</a>
+       </div>
+       <p class="subtle" id="piperStatus" role="status" aria-live="polite">Piper nutzt ein Open-Source-Modell im Browser. Beim ersten Mal müssen Modelldaten (je nach Stimme etwa 60 MB) und Laufzeitdateien geladen werden. Das kann auf dem Tablet einige Minuten dauern und benötigt ausreichend Speicher.</p>
+      </div>
+      <label class="audio-label">Oder eigene MP3/WAV-Datei<input id="voiceInput" type="file" accept="audio/*" /></label><div id="voiceStatus" class="subtle">Noch keine Audiodatei ausgewählt.</div><audio controls id="audioPreview" hidden></audio></div>
       <div class="card storyboard-card"><span class="card-overline">SHOTLIST / STORYBOARD</span><h3>Szenenaufbau</h3><p class="subtle">Die Texte kannst du für den Videoexport direkt verändern.</p><div id="sceneEditor"></div><div class="export-box"><strong>Dein Video exportieren</strong><p>Erstellt ein vertikales Video aus deinen hochgeladenen Bildern und Clips mit Text-Overlays.</p><button class="primary-btn" id="exportVideo">▸ Video als WebM erstellen <span class="button-arrow">↗</span></button><div id="renderStatus" class="subtle"></div><div class="export-note">WebM ist ein Browserformat. Für MP4/Instagram ggf. anschließend konvertieren.</div></div></div></div></div>
     </section>
     <section class="settings-section card" id="settings"><div><span class="card-overline">VERBINDUNG</span><h3>KI-Einstellungen</h3><p>Aktiviere KI-Skripte und Stimmen, sobald dein Cloudflare Worker mit den nötigen Schlüsseln eingerichtet ist. Keine API-Schlüssel im Browser eingeben.</p></div><div class="settings-controls"><label>Studio-Zugangsschlüssel<input type="password" id="studioToken" autocomplete="off" placeholder="Zugangsschlüssel (nur für diese Sitzung)" /></label><button class="outline-btn" id="saveToken">Sitzung freischalten</button><span class="subtle">Wird nur im Session Storage dieses Tabs gespeichert.</span></div></section>
@@ -117,7 +140,97 @@ function download(name,blob){const url=URL.createObjectURL(blob);const a=documen
 function fileName(ext){return `content-factory-${slugify(draft().title)}.${ext}`}
 function downloadText(name,text,mime='text/plain'){download(name,new Blob([text],{type:mime+';charset=utf-8'}))}
 function audioFile(file){if(state.voice?.url)URL.revokeObjectURL(state.voice.url);state.voice=file?{file,url:URL.createObjectURL(file)}:null;if(state.voice){$('audioPreview').src=state.voice.url;$('audioPreview').hidden=false;$('voiceStatus').textContent=`Bereit: ${file.name}`}else{$('audioPreview').hidden=true;$('voiceStatus').textContent='Noch kein Audiomaterial ausgewählt.'}}
-async function createVoice(){if(!draft())return;const btn=$('createVoice');setBusy(btn,true,'Erzeuge Stimme …');try{const response=await fetch('/api/voice',{method:'POST',headers:{'Content-Type':'application/json','X-Studio-Key':sessionStorage.getItem('studio-key')||''},body:JSON.stringify({text:draft().script}),signal:AbortSignal.timeout(120000)});if(!response.ok){const j=await response.json().catch(()=>({}));throw new Error(j.error||'KI-Stimme nicht verfügbar')}const blob=await response.blob();audioFile(new File([blob],'ki-sprecherstimme.mp3',{type:'audio/mpeg'}));toast('KI-Sprecherstimme erstellt.')}catch(err){$('voiceStatus').textContent=`Sprachgenerierung fehlgeschlagen: ${err.message}`;toast(`Stimme: ${err.message}. Alternativ eigene Datei hochladen.`)}finally{setBusy(btn,false)}}
+
+let speechTurn=0;
+function stopBrowserSpeech(){
+ speechTurn++;
+ if('speechSynthesis' in window)window.speechSynthesis.cancel();
+ if($('browserSpeechStatus'))$('browserSpeechStatus').textContent='';
+}
+function availableBrowserVoices(){
+ if(!('speechSynthesis' in window))return;
+ const selector=$('browserVoice');
+ const current=selector.value;
+ const voices=window.speechSynthesis.getVoices().filter(v=>/^de([_-]|$)/i.test(v.lang));
+ selector.replaceChildren(new Option('Automatisch · Deutsch',''));
+ voices.sort((a,b)=>a.name.localeCompare(b.name,'de')).forEach(v=>selector.add(new Option(v.name+' ('+v.lang+')',v.voiceURI)));
+ if(voices.some(v=>v.voiceURI===current))selector.value=current;
+}
+function chunkForSpeech(input,max=170){
+ const sentences=(input.match(/[^.!?]+[.!?]?/g)||[input]).map(s=>s.trim()).filter(Boolean);
+ const pieces=[];
+ for(const sentence of sentences){
+   let chunk='';
+   for(const word of sentence.split(/\s+/)){
+     if(chunk.length+word.length+1>max&&chunk){pieces.push(chunk);chunk=''}
+     chunk+=(chunk?' ':'')+word;
+   }
+   if(chunk)pieces.push(chunk);
+ }
+ return pieces;
+}
+function createVoice(){
+ const script=draft()?.script?.trim();
+ if(!script){toast('Bitte zuerst einen Entwurf mit Sprechertext auswählen.');return}
+ if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
+  $('voiceStatus').textContent='Dein Browser unterstützt die kostenlose Sprachausgabe nicht. Versuche Chrome oder Samsung Internet.';
+  return;
+ }
+ stopBrowserSpeech();
+ const myTurn=speechTurn;
+ const all=window.speechSynthesis.getVoices();
+ const voice=all.find(v=>v.voiceURI===$('browserVoice').value)||all.find(v=>/^de([_-]|$)/i.test(v.lang));
+ const parts=chunkForSpeech(script);
+ let index=0;
+ $('voiceStatus').textContent='Kostenlose Vorlesestimme läuft (keine Audiodatei).';
+ function speakNext(){
+  if(myTurn!==speechTurn)return;
+  if(index>=parts.length){$('voiceStatus').textContent='Vorlesen beendet. Für eine WAV-Datei bitte Piper verwenden.';return}
+  const utter=new SpeechSynthesisUtterance(parts[index++]);
+  utter.lang='de-DE';utter.rate=0.98;utter.volume=1;
+  if(voice)utter.voice=voice;
+  utter.onend=speakNext;
+  utter.onerror=e=>{
+   if(myTurn===speechTurn&&e.error!=='canceled'&&e.error!=='interrupted'){
+    $('voiceStatus').textContent='Gerätestimme fehlgeschlagen: '+(e.error||'unbekannter Fehler')+'. Bitte Piper versuchen.';
+   }
+  };
+  window.speechSynthesis.speak(utter);
+ }
+ speakNext();
+}
+let piperModulePromise;
+async function piperGenerate(){
+ const script=draft()?.script?.trim();
+ if(!script){toast('Bitte zuerst einen Entwurf mit Sprechertext auswählen.');return}
+ if(script.length>2000){$('piperStatus').textContent='Der Sprechertext ist zu lang (maximal 2.000 Zeichen).';return}
+ const button=$('piperGenerate'),label=$('piperStatus');
+ setBusy(button,true,'Piper wird vorbereitet …');
+ $('piperDownload').hidden=true;
+ try{
+  label.textContent='Lade Piper für den Browser. Keine kostenpflichtige API nötig …';
+  piperModulePromise ||= import('https://esm.sh/@mintplex-labs/piper-tts-web@1.0.5?bundle').catch(error=>{piperModulePromise=null;throw error});
+  const tts=await piperModulePromise;
+  if(typeof tts.predict!=='function')throw new Error('Die Piper-Bibliothek wurde nicht korrekt geladen.');
+  const voiceId=$('piperVoice').value;
+  const result=await tts.predict({text:script,voiceId},progress=>{
+   if(progress&&typeof progress.loaded==='number'&&typeof progress.total==='number'&&progress.total>0){
+    label.textContent='Piper-Modell laden: '+Math.min(100,Math.round(progress.loaded/progress.total*100))+' %';
+   }else label.textContent='Piper lädt oder berechnet die WAV-Datei …';
+  });
+  const wav=result instanceof Blob?result:new Blob([result],{type:'audio/wav'});
+  if(!wav.size||wav.size<100)throw new Error('Piper hat keine gültigen Audiodaten geliefert.');
+  audioFile(new File([wav],'sprecherstimme-piper.wav',{type:'audio/wav'}));
+  $('piperDownload').href=state.voice.url;
+  $('piperDownload').hidden=false;
+  label.textContent='Fertig! WAV-Datei erstellt und dem Video-Entwurf hinzugefügt. Jetzt abspielen oder herunterladen.';
+  toast('Kostenlose WAV-Sprecherstimme erstellt.');
+ }catch(err){
+  const message=String(err?.message||err||'unbekannter Fehler').slice(0,250);
+  label.textContent='Piper konnte auf diesem Gerät nicht gestartet werden: '+message+'. Die kostenlose Vorlesefunktion darüber bleibt verfügbar.';
+  toast('Piper derzeit nicht verfügbar. Siehe Hinweis unter WAV erstellen.');
+ }finally{setBusy(button,false)}
+}
 function drawRounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
 function wrapLines(ctx,txt,width){const words=String(txt||'').split(/\s+/);const lines=[];let line='';for(const w of words){const attempt=line?line+' '+w:w;if(ctx.measureText(attempt).width>width&&line){lines.push(line);line=w}else line=attempt}if(line)lines.push(line);return lines.slice(0,8)}
 async function prepareMedia(){return await Promise.all(state.media.map(async m=>{if(m.kind==='image'){const img=new Image();img.src=m.url;await img.decode().catch(()=>{});return {...m,element:img}}const v=document.createElement('video');v.src=m.url;v.muted=true;v.playsInline=true;v.loop=true;v.preload='auto';await new Promise(resolve=>{v.onloadeddata=resolve;v.onerror=resolve;setTimeout(resolve,3000)});return {...m,element:v}}))}
@@ -139,7 +252,7 @@ $('editTitle').oninput=e=>updateEdit('title',e.target.value);$('editScript').oni
 $('copyPost').onclick=async()=>{if(!draft())return;try{await navigator.clipboard.writeText(draft().postText);toast('Beitragstext kopiert.')}catch{toast('Kopieren nicht möglich.')}};
 $('downloadSrt').onclick=()=>draft()&&downloadText(fileName('srt'),createSrt(draft().scenes));
 $('downloadJson').onclick=()=>draft()&&downloadText(fileName('json'),JSON.stringify({...draft(),exportedAt:new Date().toISOString()},null,2),'application/json');
-$('createVoice').onclick=createVoice;$('voiceInput').onchange=e=>{const f=e.target.files?.[0];if(f)audioFile(f)};
+$('createVoice').onclick=createVoice;$('stopVoice').onclick=()=>{stopBrowserSpeech();$('voiceStatus').textContent='Vorlesen gestoppt.'};$('piperGenerate').onclick=piperGenerate;$('voiceInput').onchange=e=>{const f=e.target.files?.[0];if(f){$('piperDownload').hidden=true;audioFile(f)}};if('speechSynthesis' in window){availableBrowserVoices();window.speechSynthesis.addEventListener?.('voiceschanged',availableBrowserVoices)};
 $('exportVideo').onclick=exportVideo;
 $('saveToken').onclick=()=>{sessionStorage.setItem('studio-key',$('studioToken').value.trim());$('studioToken').value='';toast('Zugangsschlüssel nur für diesen Tab hinterlegt.');health()};
 $('helpButton').onclick=()=>toast('Start: Thema eingeben, Konzepte erzeugen, auswählen, bearbeiten und exportieren.');
