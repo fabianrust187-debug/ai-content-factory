@@ -43,6 +43,16 @@ npx wrangler secret put STUDIO_ACCESS_KEY
 Optional per `wrangler.jsonc` oder Secrets `AI_MODEL`, `TTS_MODEL`, `TTS_VOICE` anpassen. Standard: `gpt-4.1-mini`, `gpt-4o-mini-tts`, `coral`. Diese API-Nutzung kann Kosten verursachen.
 
 
+### Piper: Hintergrundprozess, kurzer Test und Abbruch
+
+- Die Sprachberechnung läuft jetzt in `public/piper-worker.js`, einem separaten Browser-Hintergrundprozess. So bleibt die Oberfläche bei langsamer oder hängender ONNX-/Phonemizer-Verarbeitung bedienbar.
+- Zuerst **Kurzen Test sprechen** verwenden; dieser erzeugt eine kurze WAV-Datei, unabhängig von der Länge des Entwurfs.
+- Für längere Entwürfe teilt die Anwendung den Text in kleine Abschnitte auf, zeigt die abgeschlossenen Abschnitte an und verbindet die PCM-Stücke zu einer WAV-Datei.
+- **Abbrechen** beendet den Worker. Ein Zeitlimit beendet hängengebliebene Vorgänge automatisch (95 Sekunden je Sprachabschnitt, sechs Minuten insgesamt).
+- Der Balken zeigt echte Download-Prozente oder abgeschlossene Sprachabschnitte. Während eines laufenden Sprachabschnitts werden die Sekunden angezeigt, keine erfundenen Prozentwerte.
+- Im ersten Sprachabschnitt lädt Piper unter Umständen noch die Phonemizer-Laufzeit. Ein erfolgreich initialisiertes Sprachmodell beweist daher nicht, dass alle WASM-Dateien bereits im Browser geladen sind.
+- Diese Änderungen sind syntaktisch geprüft, aber die erfolgreiche Audioerzeugung auf jedem Android-Browser kann erst durch einen Endgerätetest bestätigt werden.
+
 ### Piper: kostenloser WAV-Export und Netzwerkdiagnose
 
 - Die Browser-App lädt Piper bei Bedarf über einen ESM-CDN, mit einem zweiten CDN als Alternative.
