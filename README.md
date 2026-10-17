@@ -42,6 +42,15 @@ npx wrangler secret put STUDIO_ACCESS_KEY
 
 Optional per `wrangler.jsonc` oder Secrets `AI_MODEL`, `TTS_MODEL`, `TTS_VOICE` anpassen. Standard: `gpt-4.1-mini`, `gpt-4o-mini-tts`, `coral`. Diese API-Nutzung kann Kosten verursachen.
 
+
+### Piper: kostenloser WAV-Export und Netzwerkdiagnose
+
+- Die Browser-App lädt Piper bei Bedarf über einen ESM-CDN, mit einem zweiten CDN als Alternative.
+- **Die drei freigegebenen deutschen Modelle** Kerstin low, Thorsten low und Thorsten medium sowie die WASM-Laufzeiten laufen über die Worker-Routen `/api/piper-model/…` und `/api/piper-runtime/…`, um Probleme mit direkten Drittanbieter-Downloads auf mobilen Browsern zu verringern.
+- `GET /api/piper-check` prüft mit HEAD-Anfragen, ob Cloudflare Modell-Metadaten und beide Laufzeitquellen erreichen kann. **Ein grüner Diagnosewert beweist nicht, dass Piper auf jedem Handy läuft oder dass komplette Modell-Downloads und Inferenz funktionieren.**
+- Das Download-Modell kann über 60 MB groß sein und lokal zwischengespeichert werden. Mehrere Versuche benötigen ausreichend freies WLAN-Datenvolumen und Speicher. Die App zeigt getrennte Fehlermeldungen für den Bibliotheksdownload, Modell-/Laufzeitdownload und Synthese.
+- Die Gerätestimme zum direkten Vorlesen bleibt ohne Piper-Bibliothek verfügbar, kann aber nicht in eine WAV-Datei exportiert werden.
+
 ## Technische Grenzen
 
 - **WebM ist kein MP4.** Für Instagram oder Schnittprogramme kann eine Konvertierung erforderlich sein, zum Beispiel:
