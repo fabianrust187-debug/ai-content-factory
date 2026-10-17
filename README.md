@@ -2,6 +2,21 @@
 
 Mobile-first Content-Studio für Social-Media-Konzepte, Bild-/Videouploads, Storyboards, Untertitel und Video-Export.
 
+
+## Deutschsprachige Content-Playbooks (kostenlos)
+
+Im Studio befindet sich ein eigener Bereich **Playbooks** mit fünf **eigenständig formulierten** deutschsprachigen Arbeitsvorlagen. Sie sind von den fünf öffentlichen Themen bei [DemonUGC](https://demonugc.netlify.app/) inspiriert, aber keine Übernahme oder Übersetzung der dortigen Volltexte.
+
+| Bereich | Zweck |
+| --- | --- |
+| KI-UGC | Glaubwürdige Werbeclips planen – keine erfundenen Testimonials |
+| Varianten testen | Drei Einstiege zu einem bestehenden Konzept vergleichen |
+| Anfragen gewinnen | Vom Reel zu Termin-/Kontaktanfrage oder App-Einstieg |
+| Organische Reichweite | Nützliche Beiträge ohne Werbebudget planen |
+| Motion Graphics | Animierte Typografie und visuelle Erklärsequenzen gestalten |
+
+Jede Vorlage liefert Anleitungen, eine browserlokal gespeicherte Checkliste und einen bearbeitbaren deutschen Prompt. Über **„Prompt kopieren“** kann der Text in einem separat gewählten KI-Tool genutzt werden. Über **„Idee ins Studio übernehmen“** wird das Briefing-Feld für die vorhandene Konzepterstellung vorbelegt. Die Vorlagen passen sich an Projekt, Zielgruppe, Plattform und Thema an; mit **„An Thema anpassen“** werden sie neu erstellt. Es sind **keine API-Schlüssel oder kostenpflichtigen Dienste nötig**. Die Vorlagen selbst generieren **keine** neu berechneten KI-Videosequenzen, Videoschnitte oder Bilder.
+
 ## Bereits funktionsfähig
 
 - Drei **unterschiedliche** deutschsprachige Content-Konzepte pro Thema – ohne API-Schlüssel durch nachvollziehbare Textvorlagen.
