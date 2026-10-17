@@ -63,16 +63,16 @@ async function mergeAudio(blobs){
  return new Blob([out],{type:'audio/wav'});
 }
 async function loadPiper(){
- const sources=[
-  'https://esm.sh/@mintplex-labs/piper-tts-web@1.0.5?bundle&deps=onnxruntime-web@1.18.0',
-  'https://esm.run/@mintplex-labs/piper-tts-web@1.0.5'
- ];
- const errors=[];
- for(const url of sources){
-  try{const mod=await import(url);if(typeof mod.TtsSession?.create==='function')return mod;errors.push('Piper-Bibliothek ohne TtsSession');}
-  catch(e){errors.push(new URL(url).hostname+': '+String(e?.message||e).slice(0,120))}
+ try{
+  // Do not use browser CDNs for ONNX; they can bundle the Node.js build
+  // and produce "dirname is not a function" on Android.
+  const mod=await import('./vendor/piper-tts.js');
+  if(typeof mod.TtsSession?.create!=='function')
+   throw Error('Der lokal gebündelte Piper-Dienst enthält keine gültige TtsSession.');
+  return mod;
+ }catch(error){
+  throw Error('Lokaler Piper-Browser-Build konnte nicht geladen werden: '+String(error?.message||error)+'. Cloudflare-Build prüfen: npm run build vor wrangler deploy.');
  }
- throw Error('Bibliothek nicht geladen: '+errors.join(' / '));
 }
 self.onmessage=async({data})=>{
  if(data?.type!=='generate')return;
