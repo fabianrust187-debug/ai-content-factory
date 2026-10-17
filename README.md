@@ -43,6 +43,14 @@ npx wrangler secret put STUDIO_ACCESS_KEY
 Optional per `wrangler.jsonc` oder Secrets `AI_MODEL`, `TTS_MODEL`, `TTS_VOICE` anpassen. Standard: `gpt-4.1-mini`, `gpt-4o-mini-tts`, `coral`. Diese API-Nutzung kann Kosten verursachen.
 
 
+### Piper: browsergerechter ONNX-Build (Android-Fix)
+
+- Der frühere direkte CDN-Import von Piper lieferte in mobilen Browsern die fehlerhafte ONNX-WebAssembly-Initialisierung `I.dirname is not a function`. Deshalb werden Piper `1.0.5` und ONNX Runtime Web `1.18.0` jetzt mit Vite als **Browser-Bundle** erzeugt.
+- `npm install` führt per `postinstall` automatisch `npm run build` aus und schreibt `public/vendor/piper-tts.js` sowie benötigte Chunks. Der Worker lädt nun ausschließlich dieses lokal bereitgestellte Modul.
+- Für GitHub→Cloudflare Workers Builds: Das integrierte `postinstall` setzt voraus, dass die Installationsphase npm-Skripte ausführt. Andernfalls im Cloudflare-Dashboard unter **Einstellungen → Builds → Build command** `npm run build` eintragen; Deploy command bleibt `npx wrangler deploy`. Wrangler-Konfigurations-`build` wird bei Workers Builds derzeit nicht automatisch berücksichtigt.
+- Nach der Veröffentlichung muss `/vendor/piper-tts.js` JavaScript (HTTP 200) liefern. Eine reine GitHub-Änderung ohne erfolgreichen Build genügt nicht.
+- Der ONNX-WASM-Dateipfad bleibt zur passenden v1.18.0 über den erlaubten Cloudflare-Proxy geroutet. Das Verhindern des Browser-/Node-Bundlingfehlers allein garantiert noch nicht die erfolgreiche Audiosynthese auf jedem Tablet.
+
 ### Piper: Hintergrundprozess, kurzer Test und Abbruch
 
 - Die Sprachberechnung läuft jetzt in `public/piper-worker.js`, einem separaten Browser-Hintergrundprozess. So bleibt die Oberfläche bei langsamer oder hängender ONNX-/Phonemizer-Verarbeitung bedienbar.
