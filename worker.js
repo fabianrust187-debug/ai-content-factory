@@ -19,7 +19,22 @@ export default {async fetch(req,env){const path=new URL(req.url).pathname;
   }
   if(path==='/api/voice'){
    const speech=text(data.text,2000);if(!speech)return json({error:'Sprechertext fehlt.'},400);
-   try{const r=await fetch('https://api.openai.com/v1/audio/speech',{method:'POST',headers:{'Authorization':`Bearer ${env.OPENAI_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({model:env.TTS_MODEL||'gpt-4o-mini-tts',voice:env.TTS_VOICE||'coral',input:speech,response_format:'mp3'})});if(!r.ok)return json({error:'Sprachgenerierung beim Anbieter fehlgeschlagen.'},502);return new Response(r.body,{status:200,headers:{'Content-Type':'audio/mpeg','Cache-Control':'no-store'}})}catch{return json({error:'Sprachdienst derzeit nicht erreichbar.'},502)}
+   try{const r=await fetch('https://api.openai.com/v1/audio/speech',{method:'POST',headers:{'Authorization':`Bearer ${env.OPENAI_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({model:env.TTS_MODEL||'gpt-4o-mini-tts',voice:env.TTS_VOICE||'coral',input:speech,response_format:'mp3'})});if(!r.ok){
+    let code='',kind='';
+    try{const err=(await r.json())?.error||{};code=String(err.code||'').slice(0,80);kind=String(err.type||'').slice(0,80)}catch{}
+    const marker=(code+' '+kind).toLowerCase();
+    let message='Sprachgenerierung wurde vom KI-Anbieter abgelehnt.';
+    if(r.status===401)message='Der OpenAI-API-Schlüssel wurde abgelehnt. Bitte OPENAI_API_KEY in Cloudflare prüfen.';
+    else if(r.status===403)message='Dein OpenAI-Projekt hat keinen Zugriff auf die Sprachgenerierung. Bitte Modellberechtigung und Projekteinstellungen prüfen.';
+    else if(r.status===404)message='Das konfigurierte Sprachmodell ist nicht verfügbar. Bitte TTS_MODEL in Cloudflare prüfen.';
+    else if(r.status===429&&/insufficient_quota|credit_balance_exhausted|billing|spend_limit|usage_limit/.test(marker))message='OpenAI-API-Guthaben oder Ausgabenlimit erreicht. Bitte die API-Abrechnung unter platform.openai.com prüfen.';
+    else if(r.status===429)message='OpenAI hat ein Anfragelimit erreicht. Bitte kurz warten und erneut versuchen.';
+    else if(r.status===400)message='Die Sprachanfrage wurde abgelehnt. Bitte TTS_MODEL, TTS_VOICE und Sprechertext prüfen.';
+    else if(r.status>=500)message='Der Sprachdienst ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.';
+    const safeCode=/^[a-zA-Z0-9_.-]{1,64}$/.test(code)?code:undefined;
+    console.warn('TTS provider failure',{status:r.status,code:safeCode,type:kind.replace(/[^\w.-]/g,'').slice(0,64),requestId:r.headers.get('x-request-id')||undefined});
+    return json({error:message,providerStatus:r.status,providerCode:safeCode},502);
+   }return new Response(r.body,{status:200,headers:{'Content-Type':'audio/mpeg','Cache-Control':'no-store'}})}catch{return json({error:'Sprachdienst derzeit nicht erreichbar.'},502)}
   }
   return json({error:'Route nicht gefunden'},404)
  }
