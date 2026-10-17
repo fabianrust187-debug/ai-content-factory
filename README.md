@@ -6,7 +6,9 @@ Mobile-first Content-Studio für Social-Media-Konzepte, Bild-/Videouploads, Stor
 
 - Drei **unterschiedliche** deutschsprachige Content-Konzepte pro Thema – ohne API-Schlüssel durch nachvollziehbare Textvorlagen.
 - Optional **echte KI-Texte** via serverseitiger Cloudflare-Worker-Schnittstelle und OpenAI-API.
-- Optional **echte deutschsprachige KI-Sprecherstimme** via OpenAI-TTS.
+- **Kostenloses Vorlesen** auf Deutsch mit der integrierten Gerätestimme des Browsers (ohne API-Schlüssel; nur Wiedergabe, kein Export).
+- **Kostenlose Piper-TTS-WAV-Generierung direkt im Browser** (Kerstin/Thorsten) über `@mintplex-labs/piper-tts-web@1.0.5` von einem ESM-CDN; erstes Laden benötigt größere ONNX-/WASM-Dateien und kann je nach Mobilgerät scheitern. Die WAV-Datei wird als Sprecherstimme im Entwurf verwendet und kann heruntergeladen werden.
+- Optional OpenAI-TTS im Cloudflare-Worker-Backend vorhanden, die normale Oberfläche verwendet standardmäßig **keine** kostenpflichtige Sprachgenerierung.
 - Upload von Bildern und Videos (Dateien werden im Browser verarbeitet, nicht auf den Server hochgeladen).
 - Editierbare Titel, Sprechertexte, Posts und Szenen-Captions.
 - Herunterladen von Untertiteln (.srt), strukturiertem Konzept (.json), kopierbarer Caption.
@@ -22,7 +24,7 @@ Python 3 erforderlich. Im Projektordner:
 python3 -m http.server 8080 -d public
 ```
 
-Danach **http://localhost:8080** öffnen. Die App läuft im Vorlagenmodus ohne zusätzliche Installation. Die KI-Endpunkte sind lokal ohne Worker nicht aktiv.
+Danach **http://localhost:8080** öffnen. Die App läuft im Vorlagenmodus ohne zusätzliche Installation. Das kostenlose Vorlesen funktioniert unabhängig von der kostenpflichtigen KI-API; die Piper-WAV-Funktion benötigt beim ersten Start eine Internetverbindung für Bibliothek, Laufzeit und deutsches Modell. Die KI-Endpunkte sind lokal ohne Worker nicht aktiv.
 
 ## Cloudflare Workers deployen
 
@@ -50,7 +52,7 @@ ffmpeg -i content.webm -c:v libx264 -pix_fmt yuv420p -c:a aac -movflags +faststa
 
 - Der Videoexport läuft im **aktuellen Browser-Tab in Echtzeit**. Tab offen und sichtbar halten; bei längeren Aufnahmen nicht sperren.
 - Je nach Browser stehen WebM, Canvas Capture oder Audiomischung nicht zur Verfügung. Google Chrome auf modernen Android-/Desktop-Geräten ist die primäre Zielplattform.
-- Medienclips werden als visuelle Quelle geschnitten, die **Original-Tonspur** eines hochgeladenen Clips wird derzeit nicht automatisch übernommen. Für Sprache eigene MP3/WAV-Datei hochladen oder KI-Stimme generieren.
+- Medienclips werden als visuelle Quelle geschnitten, die **Original-Tonspur** eines hochgeladenen Clips wird derzeit nicht automatisch übernommen. Für Sprache eigene MP3/WAV-Datei hochladen oder eine WAV-Datei mit Piper erzeugen. Die Browser-Vorlesefunktion selbst ist **nicht** als Video-Audiospur exportierbar.
 - Der Vorlagenmodus ist **keine generative KI**. Er benutzt vordefinierte Strukturen und die eigenen Themenangaben; nur mit konfigurierter API entstehen dynamisch formulierte KI-Skripte.
 - Keine automatische Veröffentlichung, Trendsuche, Cloudspeicherung, MP4-Konvertierung oder vollständige Nutzung aller zehn aufgeführten GitHub-Tools in v1. Diese Funktionen sind Erweiterungen, nicht als fertig zu verstehen.
 - Der Studio-Zugangsschlüssel ist eine einfache Einzelbenutzer-Schranke, **kein vollwertiges Konten-/Rollen- oder Rate-Limit-System**. Für öffentlichen Mehrbenutzerbetrieb zusätzlich Cloudflare Access, Quotas und Rate-Limits einrichten.
